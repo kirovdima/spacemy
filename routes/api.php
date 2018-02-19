@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth:api')->get('/friend', 'Profile\FriendsController@get');
+Route::middleware('auth:api')->delete('/friend/{id}', 'Profile\FriendsController@delete');
+Route::middleware('auth:api')->post('/friend/{id}', 'Profile\FriendsController@add');
+
+Route::middleware('auth:api')->get('/statistic/{person_id}', 'Profile\VisitStatisticController@get');

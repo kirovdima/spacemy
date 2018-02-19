@@ -108,6 +108,20 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'vk' => [
+        'client_id' => env('VK_CLIENT_ID'),
+        'private_key' => env('VK_PRIVATE_KEY'),
+        'access_key' => env('VK_ACCESS_KEY'),
+
+        'oauth_url' => 'https://oauth.vk.com/authorize',
+        'access_token_url' => 'https://oauth.vk.com/access_token',
+        'display' => 'page',
+        'scope' => 'offline,friends',
+        'v' => '5.73',
+
+        'api_url' => 'https://api.vk.com/method',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -159,6 +173,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
     ],
 

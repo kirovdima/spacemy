@@ -7,7 +7,43 @@
 
 require('./bootstrap');
 
+window.axios = require('axios');
+let api_token = document.head.querySelector('meta[name="api-token"]');
+if (api_token) {
+    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + api_token.content;
+}
+
 window.Vue = require('vue');
+
+import VueRouter from 'vue-router';
+window.Vue.use(VueRouter);
+
+import Menu        from './components/MenuComponent.vue';
+import Friends     from './components/FriendsComponent.vue';
+import Statistic   from './components/StatisticComponent.vue';
+
+const routes = [
+    {
+        path: '/',
+        components: {
+            menu:    Menu,
+            friends: Friends,
+        },
+    },
+    {
+        path: '/statistic/:person_id/show',
+        name: 'person_statistic',
+        components: {
+            menu: Menu,
+            statistic: Statistic,
+        }
+    }
+];
+
+const router = new VueRouter({
+    mode: 'history',
+    routes: routes
+});
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -15,8 +51,4 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
-
-const app = new Vue({
-    el: '#app'
-});
+const app = new Vue({router}).$mount('#app');
