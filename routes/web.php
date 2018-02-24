@@ -11,7 +11,14 @@
 |
 */
 
-Route::get('/', function () {return view('layouts.profile2', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);});
-Route::get('/statistic/{user_id}/show', function () {return view('layouts.profile2', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);});
+Route::get('/', 'Auth\LoginController@index');
 
+Route::get('/login', 'Auth\LoginController@login');
 Route::get('/verify', 'Auth\LoginController@verify');
+
+Route::any(
+    '{all}',
+    function () {
+        return view('layouts.profile', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);
+    }
+)->where('all', '.*');

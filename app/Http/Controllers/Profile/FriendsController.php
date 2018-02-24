@@ -7,21 +7,9 @@ use App\UserFriend;
 
 class FriendsController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        if (!\Auth::check()) {
-            $oauth_url = config('app.vk.oauth_url');
-            $redirect_uri = $oauth_url . '?'
-                . 'client_id=' . config('app.vk.client_id')
-                . '&redirect_uri=http://spacemy.ru/verify'
-                . '&display=' . config('app.vk.display')
-                . '&scope=' . config('app.vk.scope')
-                . '&response_type=code'
-                . '&v=' . config('app.vk.v')
-            ;
-
-            return redirect($redirect_uri);
-        }
+        $this->middleware('auth:api');
     }
 
     public function get()

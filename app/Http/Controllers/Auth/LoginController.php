@@ -6,6 +6,30 @@ use App\Http\Controllers\Controller;
 
 class LoginController extends Controller
 {
+    public function index()
+    {
+        if (!\Auth::check()) {
+            return redirect('login');
+        }
+
+        return view('layouts.profile', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);
+    }
+
+    public function login(\Request $request)
+    {
+        $oauth_url = config('app.vk.oauth_url');
+        $redirect_uri = $oauth_url . '?'
+            . 'client_id=' . config('app.vk.client_id')
+            . '&redirect_uri=' . env('APP_URL') . '/verify'
+            . '&display=' . config('app.vk.display')
+            . '&scope=' . config('app.vk.scope')
+            . '&response_type=code'
+            . '&v=' . config('app.vk.v')
+        ;
+
+        return redirect($redirect_uri);
+    }
+
     public function verify(\Request $request)
     {
         if ($code = $request::get('code')) {
@@ -13,7 +37,7 @@ class LoginController extends Controller
             $get_token_url = $access_token_url . '?'
                 . 'client_id=' . config('app.vk.client_id')
                 . '&client_secret=' . config('app.vk.private_key')
-                . '&redirect_uri=http://spacemy.ru/verify'
+                . '&redirect_uri=' . env('APP_URL') . '/verify'
                 . '&code=' . $code
             ;
             $client = new \GuzzleHttp\Client();

@@ -8,6 +8,11 @@ use App\Services\Vk;
 
 class VisitStatisticController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function get($person_id)
     {
         $vkClient = new Vk();
@@ -33,6 +38,6 @@ class VisitStatisticController extends Controller
         $labels = array_map(function ($item) { return date('H:i', strtotime($item['created_at'])); }, $statistic);
         $data   = array_map(function ($item) { return $item['status']; }, $statistic);
 
-        return ['labels' => $labels, 'data' => $data];
+        return ['labels' => $labels, 'data' => $data, 'user' => $user];
     }
 }
