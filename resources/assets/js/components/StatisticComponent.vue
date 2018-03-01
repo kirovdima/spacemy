@@ -1,5 +1,7 @@
 <template>
-    <online-chart></online-chart>
+    <div>
+        <online-chart :maintainAspectRatio="false"></online-chart>
+    </div>
 </template>
 
 <script>
