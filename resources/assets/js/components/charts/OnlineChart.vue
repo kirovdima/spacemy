@@ -1,8 +1,8 @@
 <script>
-    import { Line } from 'vue-chartjs'
+    import { Bar } from 'vue-chartjs'
 
     export default {
-        extends: Line,
+        extends: Bar,
 
         data: function() {
             return {
@@ -34,9 +34,11 @@
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    stepSize: 1,
+                                    stepSize: 25,
                                     suggestedMin: 0,
                                     suggestedMax: 1,
+                                    min: 0,
+                                    max: 100,
                                 }
                             }]
                         }

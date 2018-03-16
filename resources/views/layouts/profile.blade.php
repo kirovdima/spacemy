@@ -16,7 +16,7 @@
     <div id="app">
         <div class="container">
             <router-view name="menu"></router-view>
-            <div class="p-5">
+            <div class="py-3">
                 <router-view name="friends"></router-view>
                 <router-view name="statistic"></router-view>
             </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Services\Vk;
 use App\UserFriend;
 
 class FriendsController extends Controller
@@ -12,7 +13,7 @@ class FriendsController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function get()
+    public function getAll()
     {
         $vkClient = new \App\Services\Vk();
         $access_token = \Auth::user()->access_token;
@@ -36,6 +37,22 @@ class FriendsController extends Controller
         });
 
         return ['vkFriends' => $vkFriends, 'userFriendIds' => $userFriendIds];
+    }
+
+    public function get($person_id)
+    {
+        $vkClient = new Vk();
+        $users = $vkClient->request(
+            'users.get',
+            \Auth::user()->access_token,
+            [
+                'user_ids' => $person_id,
+                'fields'   => 'first_name,last_name,photo_50',
+            ]
+        );
+
+        $user = array_shift($users);
+        return ['user' => $user];
     }
 
     public function add($person_id)

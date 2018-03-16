@@ -11,7 +11,8 @@
 |
 */
 
-Route::get('/friend', 'Profile\FriendsController@get');
+Route::get('/friend', 'Profile\FriendsController@getAll');
+Route::get('/friend/{id}', 'Profile\FriendsController@get');
 Route::delete('/friend/{id}', 'Profile\FriendsController@delete');
 Route::post('/friend/{id}', 'Profile\FriendsController@add');
 
