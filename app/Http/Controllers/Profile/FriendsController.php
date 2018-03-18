@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Services\Vk;
 use App\UserFriend;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FriendsController extends Controller
 {
@@ -52,7 +54,13 @@ class FriendsController extends Controller
         );
 
         $user = array_shift($users);
-        return ['user' => $user];
+
+        $is_statistic_exists = DB::table('user_friends')
+            ->where('user_id', Auth::user()->user_id)
+            ->where('friend_id', $person_id)
+            ->exists();
+
+        return ['user' => $user, 'is_statistic_exists' => $is_statistic_exists];
     }
 
     public function add($person_id)

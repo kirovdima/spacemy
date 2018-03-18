@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -52,12 +53,10 @@ class LoginController extends Controller
             if (!$user) {
                 $user = new \App\User();
                 $user->user_id      = $user_id;
-                $user->access_token = $access_token;
-                $user->save();
-            } else {
-                $user->access_token = $access_token;
-                $user->save();
+                $user->api          = Str::random(60);
             }
+            $user->access_token = $access_token;
+            $user->save();
 
             \Auth::login($user);
 
