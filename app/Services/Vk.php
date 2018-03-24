@@ -15,7 +15,14 @@ class Vk
         $this->http_client = new Client();
     }
 
-    public function request($method_name, $access_token, $params)
+    /**
+     * @param string $method_name
+     * @param string $access_token
+     * @param array  $params
+     *
+     * @return array|bool
+     */
+    private function request($method_name, $access_token, $params)
     {
         $params = array_merge(
             [
@@ -50,5 +57,47 @@ class Vk
         }
 
         return $resArr['response'];
+    }
+
+    /**
+     * @param $user
+     *
+     * @return array|bool
+     */
+    public function getFriends($user, $owner = null)
+    {
+        $friends = $this->request(
+            'friends.get',
+            $user->access_token,
+            [
+                'user_id' => $owner ? $owner->id : $user->user_id,
+                'fields'  => 'id,first_name,last_name,photo_50'
+            ]
+        );
+        if (!$friends) {
+            $friends = [];
+        }
+
+        return $friends;
+    }
+
+    /**
+     * @param $user
+     * @param array $person_ids
+     *
+     * @return array|bool
+     */
+    public function getUsers($user, array $person_ids)
+    {
+        $users = $this->request(
+            'users.get',
+            $user->access_token,
+            [
+                'user_ids' => implode(',', $person_ids),
+                'fields'   => 'first_name,last_name,photo_50',
+            ]
+        );
+
+        return $users;
     }
 }

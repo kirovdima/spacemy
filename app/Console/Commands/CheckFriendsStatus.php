@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\FriendStatus;
+use App\FriendsStatus;
 use App\Services\Vk;
 use App\User;
 use App\UserFriend;
@@ -50,28 +50,20 @@ class CheckFriendsStatus extends Command
             $friends = UserFriend::getModel()->where('user_id', $user->user_id)->get()->toArray();
             $friend_ids = array_map(function ($friend) { return $friend['friend_id']; }, $friends);
 
-            $vkFriends = $vkClient->request(
-                'users.get',
-                $user->access_token,
-                [
-                    'user_ids' => implode(',', $friend_ids),
-                    'fields'   => 'online,last_seen',
-                ]
-            );
-
+            $vkFriends = $vkClient->getUsers($user, $friend_ids);
             if (!$vkFriends) {
                 continue;
             }
 
             foreach ($vkFriends as $vkFriend) {
-                $status = $vkFriend['online'] == FriendStatus::STATUS_ONLINE
+                $status = $vkFriend['online'] == FriendsStatus::STATUS_ONLINE
                     ? $vkFriend['online']
                     : (time() - $vkFriend['last_seen']['time'] < self::TIME_INTERVAL
-                        ? FriendStatus::STATUS_ONLINE
-                        : FriendStatus::STATUS_OFFLINE
+                        ? FriendsStatus::STATUS_ONLINE
+                        : FriendsStatus::STATUS_OFFLINE
                     );
 
-                $friendStatus = new FriendStatus();
+                $friendStatus = new FriendsStatus();
                 $friendStatus->user_id = $vkFriend['id'];
                 $friendStatus->status  = $status;
                 $friendStatus->save();

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\FriendList;
+use App\FriendsList;
 use App\Services\Vk;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -49,16 +49,9 @@ class CheckFriendsList extends Command
         ');
 
         foreach ($user_friends as $user_friend) {
-            $vkFriends = $vkClient->request(
-                'friends.get',
-                $user_friend->access_token,
-                [
-                    'user_id' => $user_friend->friend_id,
-                    'fields'  => 'first_name,last_name,photo_50'
-                ]
-            );
+            $vkFriends = $vkClient->getFriends($user_friend, $user_friend->friend_id);
 
-            $friend_list = DB::table('friend_list')
+            $friend_list = DB::table('friends_list')
                 ->select('friends')
                 ->where('user_id', $user_friend->friend_id)
                 ->orderBy('updated_at', 'DESC')
@@ -68,7 +61,7 @@ class CheckFriendsList extends Command
             if ($friend_list->isEmpty()) {
                 $friends = $vkFriends['items'];
 
-                $friend_list = new FriendList();
+                $friend_list = new FriendsList();
                 $friend_list->user_id = $user_friend->friend_id;
                 $friend_list->friends = serialize($friends);
                 $friend_list->save();
@@ -83,7 +76,7 @@ class CheckFriendsList extends Command
                 $deleted_ids = array_diff($friendIds, $vkFriendIds)
                 || $added_ids = array_diff($vkFriendIds, $friendIds)
             ) {
-                $friend_list = new FriendList();
+                $friend_list = new FriendsList();
                 $friend_list->user_id = $user_friend->friend_id;
                 $friend_list->friends = serialize($vkFriends['items']);
                 $friend_list->save();
