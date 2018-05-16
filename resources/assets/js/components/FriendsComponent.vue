@@ -33,7 +33,7 @@
         },
         methods: {
             goToFriend(id) {
-                this.$router.push('/statistic/' + id + '/show');
+                this.$router.push('/statistic/' + id + '/visits');
             }
         }
     }

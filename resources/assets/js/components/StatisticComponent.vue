@@ -1,61 +1,51 @@
 <template>
     <div>
-        <div v-if="user" class="clearfix pt-3">
-            <div class="float-left"><img :src="user.photo_50"></div>
-            <div class="float-left ml-2">{{ user.first_name }} {{ user.last_name }}</div>
+        <div v-if="user" class="row pt-3">
+            <div class="col-9 clearfix">
+                <div class="float-left"><img :src="user.photo_50"></div>
+                <div class="float-left ml-2">{{ user.first_name }} <br> {{ user.last_name }}</div>
+            </div>
+            <div class="col-3 clearfix">
+                <div class="float-right">
+                    <a v-if="is_statistic_exists" v-on:click="deleteFriend(user.id)" class="btn btn-outline-danger" role="button">Не следить</a>
+                    <a v-else v-on:click="addFriend(user.id)" class="btn btn-outline-primary" role="button">Следить</a>
+                </div>
+            </div>
         </div>
         <div v-if="is_statistic_exists">
-            <div class="mt-3 pt-3 border-top">
-                <p class="text-center">Статистика активности</p>
-            </div>
-            <online-chart :maintainAspectRatio="false"></online-chart>
-            <div class="mt-3 pt-3 border-top">
-                <p class="text-center">Изменение списка друзей</p>
-            </div>
-            <div class="row mt-5">
-                <div class="col text-center">Удаленные</div>
-                <div class="col text-center">Добавленные</div>
-            </div>
-            <div v-for="list_change in friends_list_change" class="row">
-                <div class="col mt-5">
-                    <div v-for="user in list_change.delete" class="clearfix">
-                        <div class="float-left"><img :src="user.photo_50"></div>
-                        <div class="float-left ml-2">{{ user.first_name }} {{ user.last_name }}</div>
-                    </div>
-                </div>
-                <div class="col mt-5">
-                    <div v-for="user in list_change.add" class="clearfix">
-                        <div class="float-left"><img :src="user.photo_50"></div>
-                        <div class="float-left ml-2">{{ user.first_name }} {{ user.last_name }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-5">
-                <div class="col text-center">Количество друзей пользователя: {{ first_friends_count }}</div>
-            </div>
-            <div class="row mt-5 pt-3 border-top justify-content-center align-items-center">
-                <a v-on:click="deleteFriend(user.id)" class="btn btn-outline-danger" role="button">Прекратить слежение</a>
-            </div>
-        </div>
-        <div class="row mt-3 justify-content-center align-items-center" v-else-if="user">
-            <a v-on:click="addFriend(user.id)" class="btn btn-outline-primary" role="button">Начать слежение за пользователем</a>
+            <ul class="nav nav-tabs mt-5 mb-5">
+                <li class="nav-item">
+                    <router-link class="nav-link"
+                                 :to="{ name: 'person_visits_statistic' }"
+                                 v-bind:class="{'active': this.$route.name == 'person_visits_statistic'}">Активность</router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link class="nav-link"
+                                 :to="{ name: 'person_friends_statistic' }"
+                                 v-bind:class="{'active': this.$route.name == 'person_friends_statistic'}">Новые друзья</router-link>
+                </li>
+            </ul>
+            <router-view name="statisticVisits"></router-view>
+            <router-view name="statisticFriends"></router-view>
         </div>
     </div>
 </template>
 
 <script>
-    import OnlineChart from './charts/OnlineChart.vue'
+    import StatisticVisits  from './statistic/StatisticVisitsComponent.vue';
+    import StatisticFriends from './statistic/StatisticFriendsComponent.vue';
 
     export default {
-        components: { OnlineChart },
 
+        components: {
+            StatisticVisits,
+            StatisticFriends,
+        },
 
         data: function () {
             return {
                 user: null,
                 is_statistic_exists: null,
-                first_friends_count: null,
-                friends_list_change: null,
             }
         },
 
@@ -65,10 +55,6 @@
                 app.user                = response.data.user;
                 app.is_statistic_exists = response.data.is_statistic_exists;
             });
-            axios.get('/api/statistic/' + app.$route.params.person_id + '/friend').then(function (response) {
-                app.first_friends_count = response.data.first_friends_count;
-                app.friends_list_change = response.data.friends_list_change;
-            })
         },
 
         methods: {

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\FriendsList;
 use App\FriendsStatus;
 use Illuminate\Support\Facades\DB;
+use Jenssegers\Date\Date;
 
 class StatisticService
 {
@@ -33,12 +34,15 @@ class StatisticService
                 }
             };
 
+            Date::setLocale('ru');
+
             $change = [];
             if ($add_friends = array_udiff($friends, $prev_friends, $friends_diff_function)) {
                 $change['add'] = $add_friends;
             } elseif ($delete_friends = array_udiff($prev_friends, $friends, $friends_diff_function)) {
                 $change['delete'] = $delete_friends;
             }
+            $change['date'] = Date::createFromFormat('Y-m-d H:i:s', $friends_item['created_at'])->format('j F');
             $friends_list_change[] = $change;
 
             $prev_friends = $friends;
@@ -58,10 +62,12 @@ class StatisticService
             ->toArray();
         $statistic = array_reverse($statistic);
 
+        Date::setLocale('ru');
+
         $labels = array_map(function ($item) {
             $timestamp = strtotime($item['dateH'] . ':00:00');
             if (date('G', $timestamp) == 0) {
-                return date('M j', $timestamp);
+                return Date::createFromTimestamp($timestamp)->format('j F');
             } else {
                 return date('G', $timestamp);
             }

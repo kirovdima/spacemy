@@ -18,9 +18,12 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router';
 window.Vue.use(VueRouter);
 
-import Menu        from './components/MenuComponent.vue';
-import Friends     from './components/FriendsComponent.vue';
-import Statistic   from './components/StatisticComponent.vue';
+import Menu    from './components/MenuComponent.vue';
+import Friends from './components/FriendsComponent.vue';
+
+import Statistic        from './components/StatisticComponent.vue';
+import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vue';
+import StatisticFriends from './components/statistic/StatisticFriendsComponent.vue';
 
 const routes = [
     {
@@ -31,13 +34,29 @@ const routes = [
         },
     },
     {
-        path: '/statistic/:person_id/show',
+        path: '/statistic/:person_id',
         name: 'person_statistic',
         components: {
             menu: Menu,
             statistic: Statistic,
-        }
-    }
+        },
+        children: [
+            {
+                path: 'visits',
+                name: 'person_visits_statistic',
+                components: {
+                    statisticVisits: StatisticVisits
+                }
+            },
+            {
+                path: 'friends',
+                name: 'person_friends_statistic',
+                components: {
+                    statisticFriends: StatisticFriends
+                }
+            }
+        ]
+    },
 ];
 
 const router = new VueRouter({
