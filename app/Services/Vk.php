@@ -64,13 +64,13 @@ class Vk
      *
      * @return array|bool
      */
-    public function getFriends($user, $owner = null)
+    public function getFriends($user, $owner_id = null)
     {
         $friends = $this->request(
             'friends.get',
             $user->access_token,
             [
-                'user_id' => $owner ? $owner->id : $user->user_id,
+                'user_id' => $owner_id ?: $user->user_id,
                 'fields'  => 'id,first_name,last_name,photo_50'
             ]
         );
@@ -94,7 +94,7 @@ class Vk
             $user->access_token,
             [
                 'user_ids' => implode(',', $person_ids),
-                'fields'   => 'first_name,last_name,photo_50',
+                'fields'   => 'id,first_name,last_name,photo_50,online,last_seen',
             ]
         );
 

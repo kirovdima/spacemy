@@ -51,10 +51,9 @@ class CheckFriendsList extends Command
         foreach ($user_friends as $user_friend) {
             $vkFriends = $vkClient->getFriends($user_friend, $user_friend->friend_id);
 
-            $friend_list = DB::table('friends_list')
-                ->select('friends')
+            $friend_list = FriendsList::select(['friends'])
                 ->where('user_id', $user_friend->friend_id)
-                ->orderBy('updated_at', 'DESC')
+                ->orderBy('created_at', 'DESC')
                 ->limit(1)
                 ->get();
 

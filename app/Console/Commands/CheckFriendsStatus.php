@@ -47,7 +47,9 @@ class CheckFriendsStatus extends Command
 
         $users = User::all();
         foreach ($users as $user) {
-            $friends = UserFriend::getModel()->where('user_id', $user->user_id)->get()->toArray();
+            $friends = UserFriend::where('user_id', $user->user_id)
+                ->get()
+                ->toArray();
             $friend_ids = array_map(function ($friend) { return $friend['friend_id']; }, $friends);
 
             $vkFriends = $vkClient->getUsers($user, $friend_ids);

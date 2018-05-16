@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Profile;
 
+use App\Console\Commands\DeleteUserFriend;
 use App\Http\Controllers\Controller;
 use App\Services\Vk;
 use App\UserFriend;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Bus;
 
 class FriendsController extends Controller
 {
@@ -14,66 +16,79 @@ class FriendsController extends Controller
         $this->middleware('auth:api');
     }
 
+    /**
+     * @return array
+     */
     public function getAll()
     {
         $vkClient = new Vk();
-        $vkFriends = $vkClient->getFriends(Auth::user());
+        $vk_friends = $vkClient->getFriends(Auth::user());
 
-        $userFriendIds = UserFriend::where('user_id', Auth::user()->user_id)
-            ->pluck('friend_id')
-            ->toArray();
+        $user_friend_ids = UserFriend::getFriendIds(Auth::user()->user_id);
 
-        usort($vkFriends['items'], function ($friend1, $friend2) use ($userFriendIds) {
-            if (in_array($friend1['id'], $userFriendIds) && !in_array($friend2['id'], $userFriendIds)) {
+        $friends_sort_function = function ($friend1, $friend2) use ($user_friend_ids) {
+            if (in_array($friend1['id'], $user_friend_ids) && !in_array($friend2['id'], $user_friend_ids)) {
                 return -1;
-            } elseif (!in_array($friend1['id'], $userFriendIds) && in_array($friend2['id'], $userFriendIds)) {
+            } elseif (!in_array($friend1['id'], $user_friend_ids) && in_array($friend2['id'], $user_friend_ids)) {
                 return 1;
             } else {
                 return 0;
             }
-        });
+        };
+        usort($vk_friends['items'], $friends_sort_function);
 
-        return ['vkFriends' => $vkFriends, 'userFriendIds' => $userFriendIds];
+        return ['vkFriends' => $vk_friends, 'userFriendIds' => $user_friend_ids];
     }
 
+    /**
+     * @param int $person_id
+     * @return array
+     */
     public function get($person_id)
     {
         $vkClient = new Vk();
         $users = $vkClient->getUsers(Auth::user(), [$person_id]);
-        $user = array_shift($users);
 
-        $is_statistic_exists = !UserFriend::where('user_id', Auth::user()->user_id)
-            ->where('friend_id', $person_id)
-            ->get()
-            ->isEmpty();
+        $is_user_friend_exists = UserFriend::isExists(Auth::user()->user_id, $person_id);
 
-        return ['user' => $user, 'is_statistic_exists' => $is_statistic_exists];
+        return [
+            'user'                => array_shift($users),
+            'is_statistic_exists' => $is_user_friend_exists
+        ];
     }
 
+    /**
+     * @param int $person_id
+     *
+     * @return UserFriend
+     * @throws \Exception
+     */
     public function add($person_id)
     {
-        $user_id = Auth::user()->user_id;
-        $res = UserFriend::where('user_id', $user_id)
-            ->where('friend_id', $person_id)
-            ->exists();
-        if ($res) {
+        $user_friend = UserFriend::isExists(Auth::user()->user_id, $person_id);
+        if ($user_friend) {
             throw new \Exception(sprintf("[%s:%s] friends %s already added", __CLASS__, __METHOD__, $person_id));
         }
 
-        $userFriend = new UserFriend();
-        $userFriend->user_id   = $user_id;
-        $userFriend->friend_id = $person_id;
-        $userFriend->save();
+        $user_friend = new UserFriend();
+        $user_friend->user_id   = Auth::user()->user_id;
+        $user_friend->friend_id = $person_id;
+        $user_friend->save();
 
-        return [];
+        return $user_friend;
     }
 
+    /**
+     * @param int $person_id
+     *
+     * @return array
+     */
     public function delete($person_id)
     {
-        $user_id = Auth::user()->user_id;
-        UserFriend::where('user_id', $user_id)
-            ->where('friend_id', $person_id)
-            ->delete();
+        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
+        Bus::dispatch(
+            new DeleteUserFriend($user_friend)
+        );
 
         return [];
     }

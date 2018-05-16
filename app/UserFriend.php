@@ -19,5 +19,46 @@ class UserFriend extends Model
 {
     protected $table = 'user_friends';
 
+    public $incrementing = false;
+
     public $timestamps = false;
+
+    /**
+     * @param int $user_id
+     * @param int $friend_id
+     *
+     * @return bool
+     */
+    public static function isExists($user_id, $friend_id)
+    {
+        return self::where('user_id', $user_id)
+            ->where('friend_id', $friend_id)
+            ->exists();
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $friend_id
+     *
+     * @return mixed
+     */
+    public static function getByUserIdAndPersonId($user_id, $friend_id)
+    {
+        return self::where('user_id', $user_id)
+            ->where('friend_id', $friend_id)
+            ->get()
+            ->first();
+    }
+
+    /**
+     * @param int $user_id
+     *
+     * @return array
+     */
+    public static function getFriendIds($user_id)
+    {
+        return UserFriend::where('user_id', $user_id)
+            ->pluck('friend_id')
+            ->toArray();
+    }
 }
