@@ -43,6 +43,9 @@ class CheckFriendsStatus extends Command
      */
     public function handle()
     {
+        dispatch(new \App\Jobs\CheckFriendsStatus(1))->onQueue('check_friends_status');
+        return;
+
         $vkClient = new Vk();
 
         $users = User::all();
