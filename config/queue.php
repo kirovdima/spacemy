@@ -83,4 +83,10 @@ return [
         'table' => 'failed_jobs',
     ],
 
+
+
+
+
+    'prefix' => env('RABBITMQ_PREFIX', ''),
+
 ];

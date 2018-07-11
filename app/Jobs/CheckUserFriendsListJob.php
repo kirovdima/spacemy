@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\FriendsList;
+use App\MongoModels\VkFriend;
+use App\MongoModels\VkUser;
 use App\Services\Vk;
 use App\User;
 use Illuminate\Bus\Queueable;
@@ -43,7 +45,7 @@ class CheckUserFriendsListJob implements ShouldQueue
      */
     public function __construct(int $user_id, int $friend_id)
     {
-        $this->queue = self::QUEUE_NAME;
+        $this->queue = config('queue.prefix') . self::QUEUE_NAME;
 
         $this->user_id   = $user_id;
         $this->friend_id = $friend_id;
@@ -60,6 +62,16 @@ class CheckUserFriendsListJob implements ShouldQueue
 
         $vkClient = new Vk();
         $vkFriends = $vkClient->getFriends($user, $this->friend_id);
+
+        // сохраняем друзей в mongodb
+        VkFriend::where('user_id', $this->friend_id)
+            ->update(['friends' => $vkFriends['items']], ['upsert' => true]);
+
+        foreach ($vkFriends['items'] as $vkFriend) {
+            VkUser::batchUpdate(['id' => $vkFriend['id']], $vkFriend, ['upsert' => true]);
+        }
+        VkUser::execute();
+        //~
 
         $friend_list = FriendsList::select(['friends'])
             ->where('user_id', $this->friend_id)
