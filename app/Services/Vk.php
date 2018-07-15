@@ -32,7 +32,6 @@ class Vk
             $params
         );
 
-
         $url = config('app.vk.api_url')
             . '/' . $method_name
             . '?' . http_build_query($params)

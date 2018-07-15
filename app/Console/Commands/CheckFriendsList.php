@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckUserFriendsListJob;
+use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -39,6 +40,11 @@ class CheckFriendsList extends Command
      */
     public function handle()
     {
+        $users = User::get();
+        foreach ($users as $user) {
+            CheckUserFriendsListJob::dispatch($user->user_id);
+        }
+
         $user_friends = DB::select('
             SELECT u.user_id, uf.friend_id
             FROM users u 

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CheckUserFriendsListJob;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 
 class LoginController extends Controller
@@ -59,6 +61,9 @@ class LoginController extends Controller
             $user->save();
 
             \Auth::login($user);
+
+            $get_friends_job = new CheckUserFriendsListJob($user->user_id);
+            Bus::dispatchNow($get_friends_job);
 
             return redirect('/');
         } else {

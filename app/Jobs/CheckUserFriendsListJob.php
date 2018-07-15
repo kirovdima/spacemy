@@ -43,7 +43,7 @@ class CheckUserFriendsListJob implements ShouldQueue
      * @param int $user_id
      * @param int $friend_id
      */
-    public function __construct(int $user_id, int $friend_id)
+    public function __construct(int $user_id, int $friend_id = null)
     {
         $this->queue = config('queue.prefix') . self::QUEUE_NAME;
 
@@ -61,7 +61,7 @@ class CheckUserFriendsListJob implements ShouldQueue
         $user = User::find($this->user_id);
 
         $vkClient = new Vk();
-        $vkFriends = $vkClient->getFriends($user, $this->friend_id);
+        $vkFriends = $vkClient->getFriends($user, $this->friend_id ?: null);
 
         // сохраняем друзей в mongodb
         VkFriend::where('user_id', $this->friend_id)
@@ -73,34 +73,42 @@ class CheckUserFriendsListJob implements ShouldQueue
         VkUser::execute();
         //~
 
-        $friend_list = FriendsList::select(['friends'])
-            ->where('user_id', $this->friend_id)
-            ->orderBy('created_at', 'DESC')
-            ->limit(1)
-            ->get();
+        if ($this->friend_id) {
 
-        if ($friend_list->isEmpty()) {
-            $friends = $vkFriends['items'];
+            $friend_list = FriendsList::select(['friends'])
+                ->where('user_id', $this->friend_id)
+                ->orderBy('created_at', 'DESC')
+                ->limit(1)
+                ->get();
 
-            $friend_list = new FriendsList();
-            $friend_list->user_id = $this->friend_id;
-            $friend_list->friends = serialize($friends);
-            $friend_list->save();
-        } else {
-            $friends = unserialize($friend_list[0]->friends);
-        }
+            if ($friend_list->isEmpty()) {
+                $friends = $vkFriends['items'];
 
-        $friendIds = array_map(function ($friend) { return $friend['id']; }, $friends);
-        $vkFriendIds = array_map(function ($friend) { return $friend['id']; }, $vkFriends['items']);
+                $friend_list = new FriendsList();
+                $friend_list->user_id = $this->friend_id;
+                $friend_list->friends = serialize($friends);
+                $friend_list->save();
+            } else {
+                $friends = unserialize($friend_list[0]->friends);
+            }
 
-        if (
-        $deleted_ids = array_diff($friendIds, $vkFriendIds)
-            || $added_ids = array_diff($vkFriendIds, $friendIds)
-        ) {
-            $friend_list = new FriendsList();
-            $friend_list->user_id = $this->friend_id;
-            $friend_list->friends = serialize($vkFriends['items']);
-            $friend_list->save();
+            $friendIds = array_map(function ($friend) {
+                return $friend['id'];
+            }, $friends);
+            $vkFriendIds = array_map(function ($friend) {
+                return $friend['id'];
+            }, $vkFriends['items']);
+
+            if (
+            $deleted_ids = array_diff($friendIds, $vkFriendIds)
+                || $added_ids = array_diff($vkFriendIds, $friendIds)
+            ) {
+                $friend_list = new FriendsList();
+                $friend_list->user_id = $this->friend_id;
+                $friend_list->friends = serialize($vkFriends['items']);
+                $friend_list->save();
+            }
+
         }
 
         // @todo

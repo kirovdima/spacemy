@@ -1,18 +1,21 @@
+<style>
+    .friend-item:hover {
+        background-color: #e6f3ff;
+    }
+</style>
+
 <template>
-    <div class="table-responsive">
-    <table class="table table-striped sortable">
-        <tbody>
-        <tr v-for="friend in vkFriends" :key="friend.id" v-on:click="goToFriend(friend.id)" style="cursor:pointer">
-            <td><img :src="friend.photo_50"></td>
-            <td>
-                {{ friend.first_name }} {{ friend.last_name }}
-            </td>
-            <td>
-                <div v-if="userFriendIds.includes(friend.id)" class="imgContainer"><img :src="'images/spy-male.png'"></div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div>
+        <div v-for="(friends, letter) in vkFriends" class="py-4 px-2 border-bottom border-info">
+            <div v-if="letter != 'has_stat'" class="row">
+                <div class="col"><h6 class="text-info">{{ letter }}</h6></div>
+            </div>
+            <div v-for="friend in friends" :key="friend.id" v-on:click="goToFriend(friend.id)" class="friend-item row py-2" style="cursor:pointer">
+                <div class="col-3 col-sm-2 col-lg-1"><img :src="friend.photo_50"></div>
+                <div class="col-6 col-sm-8 col-lg-10">{{ friend.first_name }} {{ friend.last_name }}</div>
+                <div class="col-3 col-sm-2 col-lg-1"><div v-if="userFriendIds.includes(friend.id)" class="imgContainer"><img :src="'images/barchart.png'"></div></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -27,7 +30,7 @@
         mounted() {
             var app = this;
             axios.get('/api/friend').then(function (response) {
-                app.vkFriends     = response.data.vkFriends.items;
+                app.vkFriends     = response.data.vkFriends;
                 app.userFriendIds = response.data.userFriendIds;
             });
         },

@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Profile;
 
 use App\Console\Commands\DeleteUserFriend;
 use App\Http\Controllers\Controller;
-use App\Services\Vk;
+use App\MongoModels\VkFriend;
+use App\MongoModels\VkUser;
 use App\UserFriend;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
@@ -21,23 +22,36 @@ class FriendsController extends Controller
      */
     public function getAll()
     {
-        $vkClient = new Vk();
-        $vk_friends = $vkClient->getFriends(Auth::user());
+        $vk_friends = VkFriend::query()
+            ->where('user_id', '=', Auth::user()->user_id)
+            ->first()
+            ->toArray();
 
         $user_friend_ids = UserFriend::getFriendIds(Auth::user()->user_id);
 
-        $friends_sort_function = function ($friend1, $friend2) use ($user_friend_ids) {
-            if (in_array($friend1['id'], $user_friend_ids) && !in_array($friend2['id'], $user_friend_ids)) {
+        $sort_by_last_name_function = function ($friend1, $friend2) use ($user_friend_ids) {
+            if ($friend1['last_name'] < $friend2['last_name']) {
                 return -1;
-            } elseif (!in_array($friend1['id'], $user_friend_ids) && in_array($friend2['id'], $user_friend_ids)) {
+            } elseif ($friend1['last_name'] > $friend2['last_name']) {
                 return 1;
             } else {
                 return 0;
             }
         };
-        usort($vk_friends['items'], $friends_sort_function);
+        usort($vk_friends['friends'], $sort_by_last_name_function);
 
-        return ['vkFriends' => $vk_friends, 'userFriendIds' => $user_friend_ids];
+        $friends = [];
+        $friends['has_stat'] = [];
+        foreach ($vk_friends['friends'] as $vk_friend) {
+            if (in_array($vk_friend['id'], $user_friend_ids)) {
+                $friends['has_stat'][] = $vk_friend;
+            } else {
+                $first_letter = mb_substr($vk_friend['last_name'], 0, 1);
+                $friends[$first_letter][] = $vk_friend;
+            }
+        }
+
+        return ['vkFriends' => $friends, 'userFriendIds' => $user_friend_ids];
     }
 
     /**
@@ -46,13 +60,15 @@ class FriendsController extends Controller
      */
     public function get($person_id)
     {
-        $vkClient = new Vk();
-        $users = $vkClient->getUsers(Auth::user(), [$person_id]);
+        $user = VkUser::query()
+            ->where('id', '=', (int)$person_id)
+            ->first()
+            ->toArray();
 
         $is_user_friend_exists = UserFriend::isExists(Auth::user()->user_id, $person_id);
 
         return [
-            'user'                => array_shift($users),
+            'user'                => $user,
             'is_statistic_exists' => $is_user_friend_exists
         ];
     }
