@@ -51,13 +51,43 @@ class StatisticService
         return ['first_friends_count' => count($first_friends), 'friends_list_change' => array_reverse($friends_list_change)];
     }
 
-    public function getVisitsStatistic($person_id)
+    public function getVisitsStatistic($person_id, $period)
     {
-        $statistic = FriendsStatus::select([DB::raw('date_format(created_at, "%Y-%m-%d %H") dateH'), DB::raw('sum(status)*100/count(*) frequent')])
+        switch ($period) {
+            case 'day':
+                $group_date_format = 'date_format(created_at, "%Y-%m-%d %H:00:00")';
+                $limit = 24; // 24 часа
+                break;
+            case 'week':
+                // группируем по 6 часов
+                $group_date_format = 'date_add(
+		            date_format(created_at, "%Y-%m-%d"), 
+		                interval (
+			                case 
+                                when hour(created_at) < 6 then 0 
+                                when hour(created_at) between 6 and 11 then 6
+                                when hour(created_at) between 12 and 17 then 12
+                                when hour(created_at) >= 18 then 18
+                            end
+                        ) hour
+	                )';
+                $limit = 4 * 7; // (24 / 6) * дней в неделе
+                break;
+            case 'month':
+            default:
+                $group_date_format = 'date_format(created_at, "%Y-%m-%d")';
+                $limit = 30;
+                break;
+        }
+
+        $statistic = FriendsStatus::select([
+                DB::raw($group_date_format . ' group_date'),
+                DB::raw('sum(status)*100/count(*) frequent')
+            ])
             ->where('user_id', $person_id)
-            ->groupBy(DB::raw('date_format(created_at, "%Y-%m-%d %H")'))
-            ->orderBy(DB::raw('date_format(created_at, "%Y-%m-%d %H")'), 'desc')
-            ->limit(24)
+            ->groupBy('group_date')
+            ->orderBy('group_date', 'desc')
+            ->limit($limit)
             ->get()
             ->toArray();
         $statistic = array_reverse($statistic);
@@ -65,7 +95,7 @@ class StatisticService
         Date::setLocale('ru');
 
         $labels = array_map(function ($item) {
-            $timestamp = strtotime($item['dateH'] . ':00:00');
+            $timestamp = strtotime($item['group_date']);
             if (date('G', $timestamp) == 0) {
                 return Date::createFromTimestamp($timestamp)->format('j F');
             } else {

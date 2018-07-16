@@ -12,11 +12,11 @@ class VisitStatisticController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function get($person_id)
+    public function get($person_id, $period)
     {
         $statistic_service = new StatisticService();
 
-        return $statistic_service->getVisitsStatistic($person_id);
+        return $statistic_service->getVisitsStatistic($person_id, $period);
     }
 
     public function getFriendList($person_id)

@@ -6,8 +6,8 @@
 
 <template>
     <div>
-        <div v-for="(friends, letter) in vkFriends" class="py-4 px-2 border-bottom border-info">
-            <div v-if="letter != 'has_stat'" class="row">
+        <div v-for="(friends, letter) in vkFriends" class="py-4 px-2">
+            <div v-if="letter != 'has_stat'" class="row border-bottom border-info my-2">
                 <div class="col"><h6 class="text-info">{{ letter }}</h6></div>
             </div>
             <div v-for="friend in friends" :key="friend.id" v-on:click="goToFriend(friend.id)" class="friend-item row py-2" style="cursor:pointer">
