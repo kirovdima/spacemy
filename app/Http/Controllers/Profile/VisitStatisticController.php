@@ -10,6 +10,7 @@ class VisitStatisticController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->middleware('log');
     }
 
     public function get($person_id, $period)
