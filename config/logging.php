@@ -31,8 +31,9 @@ return [
 
     'channels' => [
         'stack' => [
-            'driver' => 'stack',
-            'channels' => ['single'],
+            'driver'   => 'stack',
+            'channels' => ['single', 'email'],
+            'level'    => 'notice',
         ],
 
         'single' => [
@@ -65,6 +66,11 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+
+        'email' => [
+            'driver' => 'custom',
+            'via'    => \App\Logging\EmailLogger::class,
+        ]
     ],
 
 ];
