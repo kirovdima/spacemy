@@ -17,4 +17,4 @@ Route::delete('/friend/{id}', 'Profile\FriendsController@delete');
 Route::post('/friend/{id}', 'Profile\FriendsController@add');
 
 Route::get('/statistic/{person_id}/friend', 'Profile\VisitStatisticController@getFriendList');
-Route::get('/statistic/{person_id}/{period}', 'Profile\VisitStatisticController@get');
+Route::get('/statistic/{person_id}/{period}/{start_date}', 'Profile\VisitStatisticController@get');

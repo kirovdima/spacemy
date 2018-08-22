@@ -13,11 +13,11 @@ class VisitStatisticController extends Controller
         $this->middleware('log');
     }
 
-    public function get($person_id, $period)
+    public function get($person_id, $period, $start_date)
     {
         $statistic_service = new StatisticService();
 
-        return $statistic_service->getVisitsStatistic($person_id, $period);
+        return $statistic_service->getVisitsStatistic($person_id, $period, $start_date);
     }
 
     public function getFriendList($person_id)

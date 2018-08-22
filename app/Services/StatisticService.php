@@ -51,12 +51,13 @@ class StatisticService
         return ['first_friends_count' => count($first_friends), 'friends_list_change' => array_reverse($friends_list_change)];
     }
 
-    public function getVisitsStatistic($person_id, $period)
+    public function getVisitsStatistic($person_id, $period, $start_date)
     {
         switch ($period) {
             case 'day':
                 $group_date_format = 'date_format(created_at, "%Y-%m-%d %H:00:00")';
-                $limit = 24; // 24 часа
+                $date_from = date('Y-m-d', strtotime($start_date));
+                $date_to   = date('Y-m-d', strtotime($start_date) + 24 * 3600);
                 break;
             case 'week':
                 // группируем по 6 часов
@@ -71,12 +72,14 @@ class StatisticService
                             end
                         ) hour
 	                )';
-                $limit = 4 * 7; // (24 / 6) * дней в неделе
+                $date_from = date('Y-m-d H:i:s', strtotime('monday this week', strtotime($start_date)));
+                $date_to   = date('Y-m-d H:i:s', strtotime('monday next week', strtotime($start_date)));
                 break;
             case 'month':
             default:
                 $group_date_format = 'date_format(created_at, "%Y-%m-%d")';
-                $limit = 30;
+                $date_from = date('Y-m-d H:i:s', strtotime('first day of this month', strtotime($start_date)));
+                $date_to   = date('Y-m-d H:i:s', strtotime('first day of next month', strtotime($start_date)));
                 break;
         }
 
@@ -85,9 +88,9 @@ class StatisticService
                 DB::raw('sum(status)*100/count(*) frequent')
             ])
             ->where('user_id', $person_id)
+            ->whereBetween('created_at', [$date_from, $date_to])
             ->groupBy('group_date')
             ->orderBy('group_date', 'desc')
-            ->limit($limit)
             ->get()
             ->toArray();
         $statistic = array_reverse($statistic);
