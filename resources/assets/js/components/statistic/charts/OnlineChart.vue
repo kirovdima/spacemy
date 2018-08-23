@@ -8,6 +8,15 @@
 
         props: ['options',],
 
+        watch: {
+            'options': {
+                handler(newOption, oldOption) {
+                    this.$data._chart.destroy();
+                    this.renderChart(this.chartData, this.options);
+                }
+            }
+        },
+
         mounted () {
             this.renderChart(this.chartData, this.options)
         }

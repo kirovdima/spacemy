@@ -1,14 +1,14 @@
 <template>
     <div>
-        <div class="mb-2 ml-4">
-            <button type="button" class="btn btn-outline-success btn-sm m-1" v-on:click="setPeriod('day')" style="cursor: pointer">день</button>
-            <button type="button" class="btn btn-outline-success btn-sm m-1" v-on:click="setPeriod('week')" style="cursor: pointer">неделя</button>
-            <button type="button" class="btn btn-outline-success btn-sm m-1" v-on:click="setPeriod('month')" style="cursor: pointer">месяц</button>
+        <div class="mb-4 ml-4">
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('day')" style="cursor: pointer">день</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('week')" style="cursor: pointer">неделя</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('month')" style="cursor: pointer">месяц</button>
         </div>
-        <div class="mb-2 ml-4">
-            <span v-on:click="setPrevStartDate()" style="cursor: pointer"><</span>
+        <div class="mb-5 ml-4">
+            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setPrevStartDate()" style="cursor: pointer"><span class="font-weight-bold"><</span></button>
             <span>{{ humanStartDate }}</span>
-            <span v-on:click="setNextStartDate()" style="cursor: pointer">></span>
+            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setNextStartDate()" style="cursor: pointer"><span class="font-weight-bold">></span></button>
         </div>
         <online-chart :maintainAspectRatio="false" :chart-data="data" v-bind:options="options"></online-chart>
     </div>
@@ -123,7 +123,7 @@
                         labels: response.data.labels,
                         datasets: [
                             {
-                                label: 'online',
+                                label: app.period === 'day' ? 'Минут онлайн' : 'Часов онлайн',
                                 backgroundColor: '#f87979',
                                 data: response.data.data
                             }
@@ -132,14 +132,17 @@
 
                     app.options = {
                         maintainAspectRatio: false,
+                        legend: {
+                            display: true,
+                        },
+                        tooltips: {
+                            enabled: false,
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    stepSize: 25,
-                                    suggestedMin: 0,
-                                    suggestedMax: 1,
-                                    min: 0,
-                                    max: 100,
+                                    unit: app.period === 'day' ? 'minute' : 'hour',
+                                    max: app.period === 'day' ? 60 : 24,
                                 }
                             }]
                         }

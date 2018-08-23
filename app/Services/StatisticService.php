@@ -56,28 +56,17 @@ class StatisticService
         switch ($period) {
             case 'day':
                 $group_date_format = 'date_format(created_at, "%Y-%m-%d %H:00:00")';
-                $date_from = date('Y-m-d', strtotime($start_date));
-                $date_to   = date('Y-m-d', strtotime($start_date) + 24 * 3600);
+                $date_from = date('Y-m-d H:i:s', strtotime($start_date));
+                $date_to   = date('Y-m-d H:i:s', strtotime($start_date) + 24 * 3600);
                 break;
             case 'week':
-                // группируем по 6 часов
-                $group_date_format = 'date_add(
-		            date_format(created_at, "%Y-%m-%d"), 
-		                interval (
-			                case 
-                                when hour(created_at) < 6 then 0 
-                                when hour(created_at) between 6 and 11 then 6
-                                when hour(created_at) between 12 and 17 then 12
-                                when hour(created_at) >= 18 then 18
-                            end
-                        ) hour
-	                )';
+                $group_date_format = 'date_format(created_at, "%Y-%m-%d 00:00:00")';
                 $date_from = date('Y-m-d H:i:s', strtotime('monday this week', strtotime($start_date)));
                 $date_to   = date('Y-m-d H:i:s', strtotime('monday next week', strtotime($start_date)));
                 break;
             case 'month':
             default:
-                $group_date_format = 'date_format(created_at, "%Y-%m-%d")';
+                $group_date_format = 'date_format(created_at, "%Y-%m-%d 00:00:00")';
                 $date_from = date('Y-m-d H:i:s', strtotime('first day of this month', strtotime($start_date)));
                 $date_to   = date('Y-m-d H:i:s', strtotime('first day of next month', strtotime($start_date)));
                 break;
@@ -85,28 +74,63 @@ class StatisticService
 
         $statistic = FriendsStatus::select([
                 DB::raw($group_date_format . ' group_date'),
-                DB::raw('sum(status)*100/count(*) frequent')
+                DB::raw('sum(status)/count(*) frequent')
             ])
             ->where('user_id', $person_id)
             ->whereBetween('created_at', [$date_from, $date_to])
             ->groupBy('group_date')
-            ->orderBy('group_date', 'desc')
+            ->orderBy('group_date', 'asc')
             ->get()
+            ->mapWithKeys(function ($stat) { return [$stat['group_date'] => $stat['frequent']]; })
             ->toArray();
-        $statistic = array_reverse($statistic);
+
+        $current_date = $date_from;
+        do {
+            if (!isset($statistic[$current_date])) {
+                $statistic[$current_date] = 0;
+            }
+            switch ($period) {
+                case 'day':
+                    $current_date = date('Y-m-d H:i:s', strtotime('+1 hour', strtotime($current_date)));
+                    break;
+                case 'week':
+                    $current_date = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($current_date)));
+                    break;
+                case 'month':
+                    $current_date = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($current_date)));
+                    break;
+            }
+        } while ($current_date < $date_to);
 
         Date::setLocale('ru');
 
-        $labels = array_map(function ($item) {
-            $timestamp = strtotime($item['group_date']);
+        $labels = array_map(function ($date) use ($period) {
+            $timestamp = strtotime($date);
             if (date('G', $timestamp) == 0) {
-                return Date::createFromTimestamp($timestamp)->format('j F');
+                if ($period == 'day') {
+                    return date('G', $timestamp);
+                } elseif ($period == 'week') {
+                    return Date::createFromTimestamp($timestamp)->format('l');
+                } else {
+                    return Date::createFromTimestamp($timestamp)->format('j F');
+                }
             } else {
                 return date('G', $timestamp);
             }
-        }, $statistic);
-        $data   = array_map(function ($item) { return $item['frequent']; }, $statistic);
+        }, array_keys($statistic));
 
-        return ['labels' => $labels, 'data' => $data];
+        $data = array_map(function ($frequent) use ($period) {
+            switch ($period) {
+                case 'day':
+                    return round($frequent * 60, 1);
+                    break;
+                case 'week':
+                case 'month':
+                    return round($frequent * 24, 1);
+                    break;
+            }
+        }, array_values($statistic));
+
+        return ['statistic' => $statistic, 'labels' => $labels, 'data' => $data];
     }
 }
