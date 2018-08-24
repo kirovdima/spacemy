@@ -27,8 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(CheckFriendsStatus::class)->everyFifteenMinutes();
-        $schedule->command(CheckFriendsList::class)->hourly();
+        $schedule->command(CheckFriendsStatus::class)->everyTenMinutes();
+        $schedule->command(CheckFriendsList::class)->hourlyAt(4);
     }
 
     /**

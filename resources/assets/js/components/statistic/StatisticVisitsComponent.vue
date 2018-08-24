@@ -1,16 +1,17 @@
 <template>
     <div>
         <div class="mb-4 ml-4">
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('day')" style="cursor: pointer">день</button>
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('week')" style="cursor: pointer">неделя</button>
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('month')" style="cursor: pointer">месяц</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('day')" style="cursor: pointer">День</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('week')" style="cursor: pointer">Неделя</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
         </div>
         <div class="mb-5 ml-4">
             <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setPrevStartDate()" style="cursor: pointer"><span class="font-weight-bold"><</span></button>
             <span>{{ humanStartDate }}</span>
             <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setNextStartDate()" style="cursor: pointer"><span class="font-weight-bold">></span></button>
+            <span v-if="wait" class="ml-5"><img width="36px" :src="'/images/loader.gif'"></span>
         </div>
-        <online-chart :maintainAspectRatio="false" :chart-data="data" v-bind:options="options"></online-chart>
+        <online-chart v-bind:class="{ 'd-none': data === null }" :maintainAspectRatio="false" :chart-data="data" v-bind:options="options"></online-chart>
     </div>
 </template>
 
@@ -35,6 +36,7 @@
                 options: null,
                 period: 'day',
                 start_date: new Date(),
+                wait: null,
             }
         },
 
@@ -117,6 +119,7 @@
 
             getStatistic() {
                 var app = this;
+                app.wait = true;
                 axios.get('/api/statistic/' + app.$route.params.person_id + '/' + app.period + '/' + this.formattedStartDate).then(function (response) {
 
                     app.data = {
@@ -147,6 +150,8 @@
                             }]
                         }
                     };
+
+                    app.wait = false;
                 });
             }
         },

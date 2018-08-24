@@ -23,7 +23,7 @@ class CheckUserFriendsStatusJob implements ShouldQueue
 
     const QUEUE_NAME = 'check_user_friends_status';
 
-    const TIME_INTERVAL = 900;
+    const TIME_INTERVAL = 600;
     const SLEEP_INTERVAL = 1000000;
 
     protected $user;

@@ -46,10 +46,11 @@
     <div id="app">
         <div class="container">
             <router-view name="menu"></router-view>
-            <div class="py-3">
+            <div class="py-3" style="min-height: 80vh">
                 <router-view name="friends"></router-view>
                 <router-view name="statistic"></router-view>
             </div>
+            <router-view name="footer"></router-view>
         </div>
     </div>
 </body>

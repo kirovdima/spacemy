@@ -20,6 +20,7 @@ window.Vue.use(VueRouter);
 
 import Menu    from './components/MenuComponent.vue';
 import Friends from './components/FriendsComponent.vue';
+import Footer  from './components/FooterComponent.vue';
 
 import Statistic        from './components/StatisticComponent.vue';
 import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vue';
@@ -31,6 +32,7 @@ const routes = [
         components: {
             menu:    Menu,
             friends: Friends,
+            footer:  Footer,
         },
     },
     {
@@ -39,6 +41,7 @@ const routes = [
         components: {
             menu: Menu,
             statistic: Statistic,
+            footer: Footer,
         },
         children: [
             {

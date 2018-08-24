@@ -9,6 +9,7 @@ use App\MongoModels\VkUser;
 use App\UserFriend;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Jenssegers\Date\Date;
 
 class FriendsController extends Controller
 {
@@ -52,7 +53,10 @@ class FriendsController extends Controller
             }
         }
 
-        return ['vkFriends' => $friends, 'userFriendIds' => $user_friend_ids];
+        Date::setLocale('ru');
+        $updated_at = (new Date($vk_friends['updated_at']))->ago();
+
+        return ['vkFriends' => $friends, 'userFriendIds' => $user_friend_ids, 'updated_at' => $updated_at];
     }
 
     /**

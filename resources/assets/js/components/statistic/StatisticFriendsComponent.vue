@@ -17,11 +17,9 @@
             </div>
         </template>
         <div v-if="friends_list_change.length == 0" class="text-center">
-            У пользователя пока нет изменений в списке друзей
+            <span v-if="wait"><img width="36px" :src="'/images/loader.gif'"></span>
+            <span v-else>У пользователя пока нет изменений в списке друзей</span>
         </div>
-        <!--<div class="row mt-5">-->
-            <!--<div class="col text-center">Количество друзей пользователя: {{ first_friends_count }}</div>-->
-        <!--</div>-->
     </div>
 </template>
 
@@ -30,16 +28,16 @@
 
         data: function () {
             return {
-                first_friends_count: null,
-                friends_list_change: null,
+                friends_list_change: [],
+                wait: true,
             }
         },
 
         mounted () {
             var app = this;
             axios.get('/api/statistic/' + app.$route.params.person_id + '/friend').then(function (response) {
-                app.first_friends_count = response.data.first_friends_count;
                 app.friends_list_change = response.data.friends_list_change;
+                app.wait = false;
             })
         },
 

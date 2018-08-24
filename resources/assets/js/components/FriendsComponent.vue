@@ -6,6 +6,9 @@
 
 <template>
     <div>
+        <div class="py-2 px-2 text-right">
+            <small class="text-info"><span>Список обновлен: </span><span><em> {{ updated_at }}</em></span></small>
+        </div>
         <div v-for="(friends, letter) in vkFriends" class="py-4 px-2">
             <div v-if="letter != 'has_stat'" class="row border-bottom border-info my-2">
                 <div class="col"><h6 class="text-info">{{ letter }}</h6></div>
@@ -25,6 +28,7 @@
             return {
                 vkFriends:     [],
                 userFriendIds: [],
+                updated_at:    null,
             }
         },
         mounted() {
@@ -32,6 +36,7 @@
             axios.get('/api/friend').then(function (response) {
                 app.vkFriends     = response.data.vkFriends;
                 app.userFriendIds = response.data.userFriendIds;
+                app.updated_at    = response.data.updated_at;
             });
         },
         methods: {
