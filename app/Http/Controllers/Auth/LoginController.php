@@ -12,10 +12,16 @@ class LoginController extends Controller
     public function index()
     {
         if (!\Auth::check()) {
-            return redirect('login');
+//            return redirect('login');
+            return redirect('signin');
         }
 
         return view('layouts.profile', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);
+    }
+
+    public function signin()
+    {
+        return view('layouts.signin');
     }
 
     public function login(\Request $request)

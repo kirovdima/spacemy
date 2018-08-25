@@ -7,7 +7,7 @@
 <template>
     <div>
         <div class="py-2 px-2 text-right">
-            <small class="text-info"><span>Список обновлен: </span><span><em> {{ updated_at }}</em></span></small>
+            <small class="text-secondary"><span>Список обновлен: </span><span><em> {{ updated_at }}</em></span></small>
         </div>
         <div v-for="(friends, letter) in vkFriends" class="py-4 px-2">
             <div v-if="letter != 'has_stat'" class="row border-bottom border-info my-2">

@@ -13,6 +13,8 @@
 
 Route::get('/', 'Auth\LoginController@index');
 
+Route::get('/signin', 'Auth\LoginController@signin');
+
 Route::get('/login', 'Auth\LoginController@login');
 Route::get('/verify', 'Auth\LoginController@verify');
 

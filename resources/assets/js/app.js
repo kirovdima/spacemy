@@ -18,6 +18,8 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router';
 window.Vue.use(VueRouter);
 
+import Signin  from './components/SigninComponent.vue';
+
 import Menu    from './components/MenuComponent.vue';
 import Friends from './components/FriendsComponent.vue';
 import Footer  from './components/FooterComponent.vue';
@@ -27,6 +29,12 @@ import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vu
 import StatisticFriends from './components/statistic/StatisticFriendsComponent.vue';
 
 const routes = [
+    {
+        path: '/signin',
+        components: {
+            signin: Signin,
+        }
+    },
     {
         path: '/',
         components: {

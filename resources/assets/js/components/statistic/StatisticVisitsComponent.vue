@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="mb-4 ml-4">
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('day')" style="cursor: pointer">День</button>
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('week')" style="cursor: pointer">Неделя</button>
-            <button type="button" class="btn btn-sm btn-outline-success m-1" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'day'}" v-on:click="setPeriod('day')" style="cursor: pointer">День</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'week'}" v-on:click="setPeriod('week')" style="cursor: pointer">Неделя</button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'month'}" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
         </div>
         <div class="mb-5 ml-4">
             <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setPrevStartDate()" style="cursor: pointer"><span class="font-weight-bold"><</span></button>
