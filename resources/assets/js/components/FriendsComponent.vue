@@ -18,18 +18,21 @@
                 <div class="col-8 col-lg-10">
                     <div class="float-left">{{ friend.first_name }}<br>{{ friend.last_name }}</div>
                     <div v-if="userFriendIds.includes(friend.id)" class="float-right">
-                        <div v-if="friend.id in todayFriendsStatistic" class="row m-1">
+                        <div v-if="friend.id in unshowFriendsStatistic" class="row m-1">
                             <div class="col">
-                                <span v-if="todayFriendsStatistic[friend.id]['add']" class="badge badge-pill badge-success float-right">
-                                    +{{ todayFriendsStatistic[friend.id]['add'] }} друзей
+                                <span v-if="unshowFriendsStatistic[friend.id]['add'] && unshowFriendsStatistic[friend.id]['delete']" class="badge badge-pill badge-warning float-right">
+                                    +{{ unshowFriendsStatistic[friend.id]['add']['count'] }}/-{{ unshowFriendsStatistic[friend.id]['delete']['count'] }} {{ unshowFriendsStatistic[friend.id]['delete']['text'] }}
                                 </span>
-                                <span v-if="todayFriendsStatistic[friend.id]['delete']" class="badge badge-pill badge-danger float-right">
-                                    -{{ todayFriendsStatistic[friend.id]['delete'] }} друзей
+                                <span v-else-if="unshowFriendsStatistic[friend.id]['add']" class="badge badge-pill badge-success float-right">
+                                    +{{ unshowFriendsStatistic[friend.id]['add']['count'] }} {{ unshowFriendsStatistic[friend.id]['add']['text'] }}
+                                </span>
+                                <span v-else-if="unshowFriendsStatistic[friend.id]['delete']" class="badge badge-pill badge-danger float-right">
+                                    -{{ unshowFriendsStatistic[friend.id]['delete']['count'] }} {{ unshowFriendsStatistic[friend.id]['delete']['text'] }}
                                 </span>
                             </div>
                         </div>
                         <div class="row m-1">
-                            <div class="col">
+                            <div class="col text-right">
                                 <small><em>
                                     <span v-if="friend.id in todayStatistic" class="text-info">{{ todayStatistic[friend.id] }}</span>
                                     <span v-else="" class="text-secondary">offline</span>
@@ -51,7 +54,7 @@
                 vkFriends:      [],
                 userFriendIds:  [],
                 todayStatistic: [],
-                todayFriendsStatistic: [],
+                unshowFriendsStatistic: [],
                 updated_at:     null,
             }
         },
@@ -62,7 +65,7 @@
                 app.userFriendIds  = response.data.userFriendIds;
                 app.updated_at     = response.data.updated_at;
                 app.todayStatistic = response.data.todayStatistic;
-                app.todayFriendsStatistic = response.data.todayFriendsStatistic;
+                app.unshowFriendsStatistic = response.data.unshowFriendsStatistic;
             });
         },
         methods: {

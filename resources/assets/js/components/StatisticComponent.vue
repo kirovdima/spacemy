@@ -22,7 +22,13 @@
                 <li class="nav-item">
                     <router-link class="nav-link"
                                  :to="{ name: 'person_friends_statistic' }"
-                                 v-bind:class="{'active': this.$route.name == 'person_friends_statistic'}">Новые друзья</router-link>
+                                 v-bind:class="{'active': this.$route.name == 'person_friends_statistic'}">
+                        Новые друзья
+                        <template v-if="unshowFriendsStatistic[user.id]">
+                            <sup v-if="unshowFriendsStatistic[user.id]['add']" class="badge badge-pill badge-success">+{{ unshowFriendsStatistic[user.id]['add'] }}</sup>
+                            <sup v-if="unshowFriendsStatistic[user.id]['delete']" class="badge badge-pill badge-danger">-{{ unshowFriendsStatistic[user.id]['delete'] }}</sup>
+                        </template>
+                    </router-link>
                 </li>
             </ul>
             <router-view name="statisticVisits"></router-view>
@@ -46,14 +52,16 @@
             return {
                 user: null,
                 is_statistic_exists: null,
+                unshowFriendsStatistic: [],
             }
         },
 
         mounted () {
             var app = this;
             axios.get('/api/friend/' + app.$route.params.person_id).then(function (response) {
-                app.user                = response.data.user;
-                app.is_statistic_exists = response.data.is_statistic_exists;
+                app.user                   = response.data.user;
+                app.is_statistic_exists    = response.data.is_statistic_exists;
+                app.unshowFriendsStatistic = response.data.unshow_friend_statistic;
             });
         },
 

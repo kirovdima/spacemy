@@ -11,10 +11,10 @@
 |
 */
 
-Route::get('/friend', 'Profile\FriendsController@getAll');
-Route::get('/friend/{id}', 'Profile\FriendsController@get');
-Route::delete('/friend/{id}', 'Profile\FriendsController@delete');
-Route::post('/friend/{id}', 'Profile\FriendsController@add');
+Route::get('/friend', 'Profile\FriendsController@getAll')->name('get_friends');
+Route::get('/friend/{id}', 'Profile\FriendsController@get')->name('get_friend');
+Route::delete('/friend/{id}', 'Profile\FriendsController@delete')->name('delete_friend');
+Route::post('/friend/{id}', 'Profile\FriendsController@add')->name('add_friend');
 
-Route::get('/statistic/{person_id}/friend', 'Profile\VisitStatisticController@getFriendList');
-Route::get('/statistic/{person_id}/{period}/{start_date}', 'Profile\VisitStatisticController@get');
+Route::get('/statistic/{person_id}/friend', 'Profile\VisitStatisticController@getFriendList')->name('friends_statistic');
+Route::get('/statistic/{person_id}/{period}/{start_date}', 'Profile\VisitStatisticController@get')->name('visit_statistic');

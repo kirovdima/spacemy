@@ -6,9 +6,13 @@
             <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'month'}" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
         </div>
         <div class="mb-5 ml-4">
-            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setPrevStartDate()" style="cursor: pointer"><span class="font-weight-bold"><</span></button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-if="isLeftArrowShow" v-on:click="setPrevStartDate()" style="cursor: pointer">
+                <span class="font-weight-bold"><</span>
+            </button>
             <span>{{ humanStartDate }}</span>
-            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-on:click="setNextStartDate()" style="cursor: pointer"><span class="font-weight-bold">></span></button>
+            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-if="isRightArrowShow" v-on:click="setNextStartDate()" style="cursor: pointer">
+                <span class="font-weight-bold">></span>
+            </button>
             <span v-if="wait" class="ml-5"><img width="36px" :src="'/images/loader.gif'"></span>
         </div>
         <online-chart v-bind:class="{ 'd-none': data === null }" :maintainAspectRatio="false" :chart-data="data" v-bind:options="options"></online-chart>
@@ -37,6 +41,7 @@
                 period: 'day',
                 start_date: new Date(),
                 wait: null,
+                start_monitoring_date: new Date(),
             }
         },
 
@@ -55,6 +60,28 @@
                         break;
                     case 'month':
                         return this.humanMonth(this.start_date);
+                        break;
+                }
+            },
+
+            isLeftArrowShow: function () {
+                let start_date = new Date(this.start_date.getFullYear(), this.start_date.getMonth(), this.start_date.getDate());
+                let start_monitoring_date = new Date(this.start_monitoring_date.getFullYear(), this.start_monitoring_date.getMonth(), this.start_monitoring_date.getDate());
+
+                return start_date > start_monitoring_date;
+            },
+
+            isRightArrowShow: function () {
+                switch (this.period) {
+                    case 'day':
+                        return this.start_date.getTime() + 24 * 3600 * 1000 < (new Date()).getTime();
+                        break;
+                    case 'week':
+                        return this.start_date.getTime() + 7 * 24 * 3600 * 1000 < (new Date()).getTime();
+                        break;
+                    case 'month':
+                        let dayInMonth = 32 - new Date((new Date()).getFullYear(), (new Date()).getMonth(), 32).getDate();
+                        return this.start_date.getTime() + dayInMonth * 24 * 3600 * 1000 < (new Date()).getTime();
                         break;
                 }
             }
@@ -121,6 +148,8 @@
                 var app = this;
                 app.wait = true;
                 axios.get('/api/statistic/' + app.$route.params.person_id + '/' + app.period + '/' + this.formattedStartDate).then(function (response) {
+
+                    app.start_monitoring_date = new Date(response.data.start_monitoring_date);
 
                     app.data = {
                         labels: response.data.labels,

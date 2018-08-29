@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\FriendsStatus
@@ -23,4 +24,18 @@ class FriendsStatus extends Model
     protected $table = 'friends_status';
 
     public $timestamps = false;
+
+    /**
+     * @param $user_id
+     * @return Model|null|object|static
+     */
+    public static function getStartMonitoringDateByUserId($user_id)
+    {
+        $first = DB::table('friends_status')
+            ->where('user_id', '=', $user_id)
+            ->orderBy('created_at', 'ASC')
+            ->first();
+
+        return $first->created_at;
+    }
 }

@@ -18,7 +18,7 @@ class ApiLog
     {
         $userVisitLog = new UserVisitLog();
         $userVisitLog->user_id = $request->user()->user_id;
-        $userVisitLog->action  = $request->route()->getActionName();
+        $userVisitLog->action  = $request->path();
         $userVisitLog->save();
 
         return $next($request);

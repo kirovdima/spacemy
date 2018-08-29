@@ -4,12 +4,100 @@ namespace App\Services;
 
 use App\FriendListChange;
 use App\FriendsStatus;
+use App\Jobs\CheckUserFriendsStatusJob;
 use App\MongoModels\VkUser;
+use App\UserVisitLog;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Jenssegers\Date\Date;
 
 class StatisticService
 {
+    /**
+     * @param int      $user_id
+     * @param int|null $person_id
+     *
+     * @return array
+     * [
+     *  'person_id' => '10ч 50мин'
+     * ]
+     */
+    public static function getTodayFriendsVisitStatistic(int $user_id, int $person_id = null)
+    {
+        $map_function = function ($stat) {
+            $hours   = floor($stat->count * CheckUserFriendsStatusJob::TIME_INTERVAL / 3600);
+            $minutes = round((($stat->count * CheckUserFriendsStatusJob::TIME_INTERVAL) % 3600) / 60);
+            return [
+                $stat->user_id => sprintf("%sч %sмин", $hours, $minutes)
+            ];
+        };
+        $today_statistic = DB::table('user_friends AS uf')
+            ->join('friends_status AS fs', 'uf.friend_id', '=', 'fs.user_id')
+            ->where('uf.user_id' , '=', $user_id)
+            ->where(DB::raw('date(fs.created_at)'), '=', DB::raw('date(NOW())'))
+            ->where('fs.status', '=', FriendsStatus::STATUS_ONLINE)
+            ->groupBy('fs.user_id')
+            ->select('fs.user_id', DB::raw('COUNT(*) AS count'))
+            ->get()
+            ->mapWithKeys($map_function)
+            ->toArray()
+        ;
+
+        return $today_statistic;
+    }
+
+    /**
+     * @param int      $user_id
+     * @param int|null $person_id
+     *
+     * @return array
+     * [
+     *  'person_id' => [
+     *      'add'    => '2',
+     *      'delete' => '1',
+     *  ],
+     *  ...
+     * ]
+     */
+    public static function getUnshowFriendsStatistic(int $user_id, int $person_id = null)
+    {
+        $last_visit_to_friends_statistic = UserVisitLog::getLastVisitToFriendsStatistic($user_id, $person_id);
+
+        $map_friends_function = function ($stat) {
+            return [
+                $stat->user_id => [
+                    'add'    => $stat->add ?: null,
+                    'delete' => $stat->delete ?: null,
+                ]
+            ];
+        };
+        $query = DB::table('user_friends AS uf')
+            ->join('friends_list_change AS flc', 'uf.friend_id' , '=', 'flc.user_id')
+            ->where('uf.user_id', '=', $user_id);
+        if ($person_id) {
+            $query
+                ->where('flc.user_id', '=', $person_id);
+        }
+        $unshow_friends_statistic = $query
+            ->where(function (Builder $query) use ($last_visit_to_friends_statistic, $person_id) {
+                foreach ($last_visit_to_friends_statistic as $user_id => $last_visit) {
+                    $query->orWhere([
+                        ['flc.user_id', '=', $user_id],
+                        ['flc.created_at', '>', $last_visit]
+                    ]);
+                }
+                $query->orWhereNotIn('flc.user_id', array_keys($last_visit_to_friends_statistic));
+            })
+            ->groupBy('flc.user_id')
+            ->select('flc.user_id', DB::raw('SUM(IF(flc.status="add",1,0)) AS `add`'), DB::raw('SUM(IF(flc.status="delete",1,0)) AS `delete`'))
+            ->get()
+            ->mapWithKeys($map_friends_function)
+            ->toArray()
+        ;
+
+        return $unshow_friends_statistic;
+    }
+
     public function getFriendsStatistic($person_id)
     {
         $changes = FriendListChange::query()
@@ -121,6 +209,8 @@ class StatisticService
             }
         }, array_values($statistic));
 
-        return ['statistic' => $statistic, 'labels' => $labels, 'data' => $data];
+        $start_monitoring_date = FriendsStatus::getStartMonitoringDateByUserId($person_id);
+
+        return ['labels' => $labels, 'data' => $data, 'start_monitoring_date' => $start_monitoring_date];
     }
 }
