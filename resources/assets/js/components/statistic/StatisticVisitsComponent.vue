@@ -6,7 +6,7 @@
             <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'month'}" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
         </div>
         <div class="mb-5 ml-4">
-            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-if="isLeftArrowShow" v-on:click="setPrevStartDate()" style="cursor: pointer">
+            <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-bind:class="{ 'disabled' : !isLeftArrowShow }" v-on:click="setPrevStartDate()" style="cursor: pointer">
                 <span class="font-weight-bold"><</span>
             </button>
             <span>{{ humanStartDate }}</span>
@@ -47,7 +47,7 @@
 
         computed: {
             formattedStartDate: function () {
-                return this.start_date.toISOString().slice(0, 10)
+                return this.start_date.getFullYear() + '-' + (this.start_date.getMonth() + 1) + '-' + this.start_date.getDate();
             },
 
             humanStartDate: function() {
@@ -99,7 +99,7 @@
                         date.setDate(1);
                         break;
                 }
-                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1);
 
                 this.getStatistic();
             },
@@ -119,7 +119,7 @@
                         date.setDate(1); // на начало месяца
                         break;
                 }
-                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1);
 
                 this.getStatistic();
             },
@@ -139,7 +139,7 @@
                         date.setDate(1); // на начало месяца
                         break;
                 }
-                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+                this.start_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 1);
 
                 this.getStatistic();
             },

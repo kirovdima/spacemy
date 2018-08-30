@@ -168,6 +168,19 @@ class StatisticService
             }
             switch ($period) {
                 case 'day':
+                    if ($current_date == date('Y-m-d H') . ':00:00') {
+                        $statistic[$current_date] *= (floor(date('i') * 60 / CheckUserFriendsStatusJob::TIME_INTERVAL) + 1) / (3600 / CheckUserFriendsStatusJob::TIME_INTERVAL);
+                    }
+                    break;
+                case 'week':
+                case 'month':
+                    if ($current_date == date('Y-m-d') . ' 00:00:00') {
+                        $statistic[$current_date] *= floor((date('H') * 3600 + date('i') * 60) / CheckUserFriendsStatusJob::TIME_INTERVAL) / (24 * 3600 / CheckUserFriendsStatusJob::TIME_INTERVAL);
+                    }
+                    break;
+            }
+            switch ($period) {
+                case 'day':
                     $current_date = date('Y-m-d H:i:s', strtotime('+1 hour', strtotime($current_date)));
                     break;
                 case 'week':
@@ -184,6 +197,9 @@ class StatisticService
 
         $labels = array_map(function ($date) use ($period) {
             $timestamp = strtotime($date);
+            if ($timestamp > date('U')) {
+                return '';
+            }
             if (date('G', $timestamp) == 0) {
                 if ($period == 'day') {
                     return date('G', $timestamp);
