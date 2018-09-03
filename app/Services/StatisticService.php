@@ -6,8 +6,10 @@ use App\FriendListChange;
 use App\FriendsStatus;
 use App\Jobs\CheckUserFriendsStatusJob;
 use App\MongoModels\VkUser;
+use App\UserFriend;
 use App\UserVisitLog;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Jenssegers\Date\Date;
 
@@ -193,11 +195,13 @@ class StatisticService
         } while ($current_date < $date_to);
         ksort($statistic);
 
-        Date::setLocale('ru');
+        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
+        $start_monitoring_date = $user_friend->created_at;
 
-        $labels = array_map(function ($date) use ($period) {
+        Date::setLocale('ru');
+        $labels = array_map(function ($date) use ($period, $start_monitoring_date) {
             $timestamp = strtotime($date);
-            if ($timestamp > date('U')) {
+            if ($timestamp > date('U') /*|| $timestamp < strtotime($start_monitoring_date) - 3600*/) {
                 return '';
             }
             if (date('G', $timestamp) == 0) {
@@ -224,8 +228,6 @@ class StatisticService
                     break;
             }
         }, array_values($statistic));
-
-        $start_monitoring_date = FriendsStatus::getStartMonitoringDateByUserId($person_id);
 
         return ['labels' => $labels, 'data' => $data, 'start_monitoring_date' => $start_monitoring_date];
     }

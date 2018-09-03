@@ -36,6 +36,6 @@ class FriendsStatus extends Model
             ->orderBy('created_at', 'ASC')
             ->first();
 
-        return $first->created_at;
+        return $first ? $first->created_at : null;
     }
 }

@@ -88,13 +88,22 @@ class FriendsController extends Controller
             ->first()
             ->toArray();
 
-        $is_user_friend_exists = UserFriend::isExists(Auth::user()->user_id, $person_id);
+        $is_user_friend_exists   = UserFriend::isExists(Auth::user()->user_id, $person_id);
         $unshow_friend_statistic = StatisticService::getUnshowFriendsStatistic(Auth::user()->user_id, $person_id);
 
+        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
+        Date::setLocale('ru');
+        $start_monitoring_rus = $user_friend
+            ? ($user_friend->created_at > date('Y-m-d H:i:s', strtotime('-1 days'))
+                ? (new Date($user_friend->created_at))->ago()
+                : (new Date($user_friend->created_at))->format('j F Y'))
+            : null;
+
         return [
-            'user'                => $user,
-            'is_statistic_exists' => $is_user_friend_exists,
+            'user'                    => $user,
+            'is_statistic_exists'     => $is_user_friend_exists,
             'unshow_friend_statistic' => $unshow_friend_statistic,
+            'start_monitoring_rus'    => $start_monitoring_rus,
         ];
     }
 

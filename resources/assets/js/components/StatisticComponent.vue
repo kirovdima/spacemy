@@ -12,8 +12,11 @@
                 </div>
             </div>
         </div>
+        <div class="mt-5">
+            <span v-if="start_monitoring_rus" class="text-info"><small>Начало сбора статистики: <em>{{ start_monitoring_rus }}</em></small></span>
+        </div>
         <div v-if="is_statistic_exists">
-            <ul class="nav nav-tabs mt-5 mb-5">
+            <ul class="nav nav-tabs mt-3 mb-5">
                 <li class="nav-item">
                     <router-link class="nav-link"
                                  :to="{ name: 'person_visits_statistic' }"
@@ -53,6 +56,7 @@
                 user: null,
                 is_statistic_exists: null,
                 unshowFriendsStatistic: [],
+                start_monitoring_rus: null,
             }
         },
 
@@ -62,6 +66,7 @@
                 app.user                   = response.data.user;
                 app.is_statistic_exists    = response.data.is_statistic_exists;
                 app.unshowFriendsStatistic = response.data.unshow_friend_statistic;
+                app.start_monitoring_rus   = response.data.start_monitoring_rus;
             });
         },
 
@@ -75,7 +80,8 @@
             deleteFriend(id) {
                 var app = this;
                 axios.delete('/api/friend/' + id).then(function (response) {
-                    app.is_statistic_exists = false;
+                    app.is_statistic_exists  = false;
+                    app.start_monitoring_rus = false;
                 });
             },
         }
