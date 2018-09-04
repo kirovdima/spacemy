@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Console\Commands\DeleteUserFriend;
+use App\Exceptions\Exception;
 use App\Http\Controllers\Controller;
-use App\MongoModels\VkFriend;
 use App\MongoModels\VkUser;
-use App\Services\StatisticService;
+use App\Services\FriendListService;
+use App\Services\Statistic\FriendsStatisticService;
+use App\Services\Statistic\VisitStatisticService;
 use App\UserFriend;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Lang;
-use Jenssegers\Date\Date;
 
 class FriendsController extends Controller
 {
@@ -26,52 +26,33 @@ class FriendsController extends Controller
      */
     public function getAll()
     {
-        $vk_friends = VkFriend::query()
-            ->where('user_id', '=', Auth::user()->user_id)
-            ->first()
-            ->toArray();
+        $friend_list_service = new FriendListService();
+        $friend_list_service
+            ->setOwnerId(Auth::user()->user_id)
+            ->sortByLastName()
+            ->separateByHasStatAndFirstLetter();
 
-        $user_friend_ids = UserFriend::getFriendIds(Auth::user()->user_id);
+        $friends    = $friend_list_service->getFriends();
+        $updated_at = $friend_list_service->getFormattedUpdatedAt();
+        $friend_ids = $friend_list_service->getFriendIds();
 
-        $sort_by_last_name_function = function ($friend1, $friend2) use ($user_friend_ids) {
-            if ($friend1['last_name'] < $friend2['last_name']) {
-                return -1;
-            } elseif ($friend1['last_name'] > $friend2['last_name']) {
-                return 1;
-            } else {
-                return 0;
-            }
-        };
-        usort($vk_friends['friends'], $sort_by_last_name_function);
+        $visit_statistic_service = new VisitStatisticService();
+        $visit_statistic_service
+            ->setOwnerId(Auth::user()->user_id);
+        $today_visit_statistic = $visit_statistic_service->getTodayAggregateStatistic();
 
-        $friends = [];
-        $friends['has_stat'] = [];
-        foreach ($vk_friends['friends'] as $vk_friend) {
-            if (in_array($vk_friend['id'], $user_friend_ids)) {
-                $friends['has_stat'][] = $vk_friend;
-            } else {
-                $first_letter = mb_substr($vk_friend['last_name'], 0, 1);
-                $friends[$first_letter][] = $vk_friend;
-            }
-        }
-
-        Date::setLocale('ru');
-        $updated_at = (new Date($vk_friends['updated_at']))->ago();
-
-
-        $today_friends_visit_statistic   = StatisticService::getTodayFriendsVisitStatistic(Auth::user()->user_id);
-        $unshow_friends_statistic        = StatisticService::getUnshowFriendsStatistic(Auth::user()->user_id);
-        $unshow_friends_statistic = array_map(function ($statistic) {
-            return [
-                'add'    => $statistic['add']    ? ['count' => $statistic['add'], 'text' => Lang::choice(' друг| друга| друзей', $statistic['add'], [], 'ru') ] : null,
-                'delete' => $statistic['delete'] ? ['count' => $statistic['delete'], 'text' => Lang::choice(' друг| друга| друзей', $statistic['delete'], [], 'ru') ] : null,
-            ];
-        }, $unshow_friends_statistic);
+        $friends_statistic_service = new FriendsStatisticService();
+        $friends_statistic_service
+            ->setOwnerId(Auth::user()->user_id)
+            ->generateUnshowAggregateStatistic()
+            ->formateAggregateStatistic()
+        ;
+        $unshow_friends_statistic = $friends_statistic_service->getStatistic();
 
         return [
             'vkFriends'      => $friends,
-            'userFriendIds'  => $user_friend_ids,
-            'todayStatistic' => $today_friends_visit_statistic,
+            'userFriendIds'  => $friend_ids,
+            'todayStatistic' => $today_visit_statistic,
             'unshowFriendsStatistic' => $unshow_friends_statistic,
             'updated_at'     => $updated_at,
         ];
@@ -79,31 +60,26 @@ class FriendsController extends Controller
 
     /**
      * @param int $person_id
+     *
      * @return array
      */
-    public function get($person_id)
+    public function get(int $person_id)
     {
-        $user = VkUser::query()
-            ->where('id', '=', (int)$person_id)
-            ->first()
-            ->toArray();
-
-        $is_user_friend_exists   = UserFriend::isExists(Auth::user()->user_id, $person_id);
-        $unshow_friend_statistic = StatisticService::getUnshowFriendsStatistic(Auth::user()->user_id, $person_id);
-
+        $user = VkUser::getUser($person_id);
         $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
-        Date::setLocale('ru');
-        $start_monitoring_rus = $user_friend
-            ? ($user_friend->created_at > date('Y-m-d H:i:s', strtotime('-1 days'))
-                ? (new Date($user_friend->created_at))->ago()
-                : (new Date($user_friend->created_at))->format('j F Y'))
-            : null;
+
+        $friends_statistic_service = new FriendsStatisticService();
+        $friends_statistic_service
+            ->setOwnerId(Auth::user()->user_id)
+            ->generateUnshowAggregateStatistic($person_id)
+        ;
+        $unshow_friend_statistic = $friends_statistic_service->getStatistic();
 
         return [
             'user'                    => $user,
-            'is_statistic_exists'     => $is_user_friend_exists,
+            'is_statistic_exists'     => $user_friend ? true : false,
             'unshow_friend_statistic' => $unshow_friend_statistic,
-            'start_monitoring_rus'    => $start_monitoring_rus,
+            'start_monitoring_rus'    => $user_friend ? $user_friend->getFormattedCreatedAt() : null,
         ];
     }
 
@@ -113,11 +89,11 @@ class FriendsController extends Controller
      * @return UserFriend
      * @throws \Exception
      */
-    public function add($person_id)
+    public function add(int $person_id)
     {
-        $user_friend = UserFriend::isExists(Auth::user()->user_id, $person_id);
+        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
         if ($user_friend) {
-            throw new \Exception(sprintf("[%s:%s] friends %s already added", __CLASS__, __METHOD__, $person_id));
+            throw new Exception(sprintf("friend '%s' already added", $person_id));
         }
 
         $user_friend = new UserFriend();
@@ -132,10 +108,15 @@ class FriendsController extends Controller
      * @param int $person_id
      *
      * @return array
+     * @throws Exception
      */
-    public function delete($person_id)
+    public function delete(int $person_id)
     {
         $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
+        if (!$user_friend) {
+            throw new Exception(sprintf("user '%s' is not a friend", $person_id));
+        }
+
         Bus::dispatch(
             new DeleteUserFriend($user_friend)
         );

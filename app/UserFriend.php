@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Date\Date;
 
 /**
  * App\UserFriend
@@ -27,22 +28,9 @@ class UserFriend extends Model
      * @param int $user_id
      * @param int $friend_id
      *
-     * @return bool
+     * @return $this
      */
-    public static function isExists($user_id, $friend_id)
-    {
-        return self::where('user_id', $user_id)
-            ->where('friend_id', $friend_id)
-            ->exists();
-    }
-
-    /**
-     * @param int $user_id
-     * @param int $friend_id
-     *
-     * @return mixed
-     */
-    public static function getByUserIdAndPersonId($user_id, $friend_id)
+    public static function getByUserIdAndPersonId(int $user_id, int $friend_id)
     {
         return self::where('user_id', $user_id)
             ->where('friend_id', $friend_id)
@@ -60,5 +48,19 @@ class UserFriend extends Model
         return UserFriend::where('user_id', $user_id)
             ->pluck('friend_id')
             ->toArray();
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getFormattedCreatedAt()
+    {
+        Date::setLocale('ru');
+        $formatted_created_at = $this->created_at > date('Y-m-d H:i:s', strtotime('-1 days'))
+            ? (new Date($this->created_at))->ago()
+            : (new Date($this->created_at))->format('j F Y')
+        ;
+
+        return $formatted_created_at;
     }
 }

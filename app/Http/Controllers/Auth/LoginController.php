@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Exceptions\Exception;
 use App\Http\Controllers\Controller;
 use App\Jobs\CheckUserFriendsListJob;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 
@@ -12,11 +14,10 @@ class LoginController extends Controller
     public function index()
     {
         if (!\Auth::check()) {
-//            return redirect('login');
             return redirect('signin');
         }
 
-        return view('layouts.profile', ['api_token' => \Auth::user() ? \Auth::user()->api_token : '']);
+        return view('layouts.profile', ['api_token' => Auth::user() ? Auth::user()->api_token : '']);
     }
 
     public function signin()
@@ -66,14 +67,14 @@ class LoginController extends Controller
             $user->access_token = $access_token;
             $user->save();
 
-            \Auth::login($user);
+            Auth::login($user);
 
             $get_friends_job = new CheckUserFriendsListJob($user->user_id);
             Bus::dispatchNow($get_friends_job);
 
             return redirect('/');
         } else {
-            throw new \Exception(sprintf("Code not found: %s", var_export($request::all(), true)));
+            throw new Exception(sprintf("Code not found: %s", var_export($request::all(), true)));
         }
     }
 }
