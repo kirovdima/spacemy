@@ -1,9 +1,14 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="Следить за друзьями вконтакте">
+    <meta name="keywords" content="Следить за друзьями вконтакте, активность друзей вконтакте, добавленные, удаленные друзья">
+    <meta http-equiv="Content-Language" content="ru">
+    <meta name="robots" content="ALL,index,follow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="yandex-verification" content="144ebb06bc676d16" />
 
     <link rel="stylesheet" href="/css-new/bootstrap.min.css"/>
     <link rel="stylesheet" href="/css-new/bootstrap-grid.min.css"/>

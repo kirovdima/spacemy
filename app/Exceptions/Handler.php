@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 
 class Handler extends ExceptionHandler
 {
@@ -49,7 +50,20 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return response()->json(['error_message' => $exception->getMessage()], $exception->getCode());
+        Log::error(
+            sprintf(
+                "Exception message: %s; code: %s; file: %s:%s;\n\nTrace: %s",
+                $exception->getMessage(),
+                $exception->getCode(),
+                $exception->getFile(),
+                $exception->getLine(),
+                $exception->getTraceAsString()
+            )
+        );
+        return response()->json(
+            ['error_message' => $exception->getMessage()],
+            $exception->getCode() ?: 500
+        );
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
