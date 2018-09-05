@@ -6,11 +6,14 @@
                 <div class="float-left ml-2">{{ user.first_name }} <br> {{ user.last_name }}</div>
             </div>
             <div class="col-3 clearfix">
-                <div class="float-right">
+                <div v-if="!error_message" class="float-right">
                     <a v-if="is_statistic_exists" v-on:click="deleteFriend(user.id)" class="btn btn-outline-danger" role="button">Не следить</a>
                     <a v-else v-on:click="addFriend(user.id)" class="btn btn-outline-primary" role="button">Следить</a>
                 </div>
             </div>
+        </div>
+        <div v-if="error_message" class="alert alert-danger my-3" role="alert">
+            <small>{{ error_message }}</small>
         </div>
         <div class="mt-5">
             <span v-if="start_monitoring_rus" class="text-info"><small>Начало сбора статистики: <em>{{ start_monitoring_rus }}</em></small></span>
@@ -41,10 +44,16 @@
 </template>
 
 <script>
+    import {errorsMixin} from './mixins/errors.js'
+
     import StatisticVisits  from './statistic/StatisticVisitsComponent.vue';
     import StatisticFriends from './statistic/StatisticFriendsComponent.vue';
 
     export default {
+
+        mixins: [
+            errorsMixin,
+        ],
 
         components: {
             StatisticVisits,
@@ -57,6 +66,8 @@
                 is_statistic_exists: null,
                 unshowFriendsStatistic: [],
                 start_monitoring_rus: null,
+
+                error_message: null,
             }
         },
 
@@ -73,9 +84,14 @@
         methods: {
             addFriend(id) {
                 var app = this;
-                axios.post('/api/friend/' + id).then(function (response) {
-                    app.is_statistic_exists = true;
-                })
+                axios.post('/api/friend/' + id)
+                    .then(function (response) {
+                        app.is_statistic_exists = true;
+                    })
+                    .catch(error => {
+                        this.error_message = this.getTextError(error.response.status, error.response.data.error_message);
+                    });
+
             },
             deleteFriend(id) {
                 var app = this;

@@ -6,6 +6,16 @@ use App\Exceptions\Exception;
 
 class PeriodFactory
 {
+    const DAY_PERIOD   = 'day';
+    const WEEK_PERIOD  = 'week';
+    const MONTH_PERIOD = 'month';
+
+    public static $allowed_period = [
+        self::DAY_PERIOD,
+        self::WEEK_PERIOD,
+        self::MONTH_PERIOD
+    ];
+
     /**
      * @param string $type
      *
@@ -15,11 +25,11 @@ class PeriodFactory
     public static function getPeriod(string $type): PeriodInterface
     {
         switch ($type) {
-            case 'day':
+            case self::DAY_PERIOD:
                 return new DayPeriod();
-            case 'week':
+            case self::WEEK_PERIOD:
                 return new WeekPeriod();
-            case 'month':
+            case self::MONTH_PERIOD:
                 return new MonthPeriod();
         }
     }

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Exceptions\Exception;
 use App\Http\Controllers\Controller;
 use App\Jobs\CheckUserFriendsListJob;
+use App\MongoModels\VkFriend;
+use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
@@ -25,7 +27,7 @@ class LoginController extends Controller
         return view('layouts.signin');
     }
 
-    public function login(\Request $request)
+    public function login()
     {
         $oauth_url = config('app.vk.oauth_url');
         $redirect_uri = $oauth_url . '?'
@@ -40,41 +42,45 @@ class LoginController extends Controller
         return redirect($redirect_uri);
     }
 
-    public function verify(\Request $request)
+    public function verify(Request $request)
     {
-        if ($code = $request::get('code')) {
-            $access_token_url = config('app.vk.access_token_url');
-            $get_token_url = $access_token_url . '?'
-                . 'client_id=' . config('app.vk.client_id')
-                . '&client_secret=' . config('app.vk.private_key')
-                . '&redirect_uri=' . env('APP_URL') . '/verify'
-                . '&code=' . $code
-            ;
-            $client = new \GuzzleHttp\Client();
-            /** @var \GuzzleHttp\Psr7\Response $res */
-            $res = $client->request('GET', $get_token_url);
-            $json = json_decode($res->getBody(), true);
+        $this->validate($request, [
+            'code' => 'required'
+        ]);
 
-            $user_id      = $json['user_id'];
-            $access_token = $json['access_token'];
+        $code = $request->get('code');
+        $access_token_url = config('app.vk.access_token_url');
+        $get_token_url = $access_token_url . '?'
+            . 'client_id=' . config('app.vk.client_id')
+            . '&client_secret=' . config('app.vk.private_key')
+            . '&redirect_uri=' . env('APP_URL') . '/verify'
+            . '&code=' . $code
+        ;
 
-            $user = \App\User::getModel()->where('user_id', $user_id)->first();
-            if (!$user) {
-                $user = new \App\User();
-                $user->user_id      = $user_id;
-                $user->api          = Str::random(60);
-            }
-            $user->access_token = $access_token;
-            $user->save();
+        $res = (new \GuzzleHttp\Client())
+            ->request('GET', $get_token_url)
+        ;
+        $json = json_decode($res->getBody(), true);
 
-            Auth::login($user);
+        $user_id      = $json['user_id'];
+        $access_token = $json['access_token'];
 
+        $user = User::find($user_id);
+        if (!$user) {
+            $user = new User();
+            $user->user_id      = $user_id;
+            $user->api          = Str::random(60);
+        }
+        $user->access_token = $access_token;
+        $user->save();
+
+        Auth::login($user);
+
+        if ([] == VkFriend::getFriends($user->user_id)) {
             $get_friends_job = new CheckUserFriendsListJob($user->user_id);
             Bus::dispatchNow($get_friends_job);
-
-            return redirect('/');
-        } else {
-            throw new Exception(sprintf("Code not found: %s", var_export($request::all(), true)));
         }
+
+        return redirect('/');
     }
 }

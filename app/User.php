@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\MongoModels\VkFriend;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,4 +30,43 @@ class User extends Model implements Authenticatable
     protected $primaryKey = 'user_id';
 
     public $incrementing = false;
+
+    protected $fillable = ['user_id', 'access_token', 'api_token'];
+
+    /**
+     * @param int $person_id
+     * @return bool
+     */
+    public function isFriend(int $person_id)
+    {
+        $vk_friends = VkFriend::getFriends($this->user_id);
+        if ([] === $vk_friends) {
+            return false;
+        }
+
+        foreach ($vk_friends['friends'] as $friend) {
+            if ($person_id == $friend['id']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param int $person_id
+     * @return bool
+     */
+    public function isStatisticAvailable(int $person_id)
+    {
+        return (bool) UserFriend::getByUserIdAndPersonId($this->user_id, $person_id);
+    }
+
+    /**
+     * @return int
+     */
+    public function watchingPersonsCount()
+    {
+        return UserFriend::getPersonsCount($this->user_id);
+    }
 }

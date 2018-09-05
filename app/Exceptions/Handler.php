@@ -49,7 +49,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return response()->json(['error' => $exception->getMessage()], 500);
+        return response()->json(['error_message' => $exception->getMessage()], $exception->getCode());
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)

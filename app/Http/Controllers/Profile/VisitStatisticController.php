@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Profile;
 
 use App\Entity\Period\PeriodFactory;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FriendsStatisticRequest;
+use App\Http\Requests\VisitsStatisticRequest;
 use App\Services\Statistic\FriendsStatisticService;
 use App\Services\Statistic\VisitStatisticService;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +18,12 @@ class VisitStatisticController extends Controller
         $this->middleware('log');
     }
 
-    public function get($person_id, $period, $start_date)
+    public function get(VisitsStatisticRequest $request)
     {
+        $person_id  = $request->route('person_id');
+        $period     = $request->route('period');
+        $start_date = $request->route('start_date');
+
         $period_instance = PeriodFactory::getPeriod($period);
 
         $visit_statistic_service = new VisitStatisticService();
@@ -38,8 +44,10 @@ class VisitStatisticController extends Controller
         return ['labels' => $labels, 'data' => $data, 'start_monitoring_date' => $start_monitoring_date];
     }
 
-    public function getFriendList($person_id)
+    public function getFriendList(FriendsStatisticRequest $request)
     {
+        $person_id = $request->route('person_id');
+
         $friends_statistic_service = new FriendsStatisticService();
         $friends_statistic_service
             ->setOwnerId(Auth::user()->user_id);

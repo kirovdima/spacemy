@@ -51,6 +51,16 @@ class UserFriend extends Model
     }
 
     /**
+     * @param int $user_id
+     * @return int
+     */
+    public static function getPersonsCount(int $user_id)
+    {
+        return self::where('user_id', $user_id)
+            ->count();
+    }
+
+    /**
      * @return mixed|string
      */
     public function getFormattedCreatedAt()

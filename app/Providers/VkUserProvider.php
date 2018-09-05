@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\GenericUser;
+use App\User;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
@@ -110,15 +110,13 @@ class VkUserProvider implements UserProvider
     }
 
     /**
-     * Get the generic user.
-     *
-     * @param  mixed  $user
-     * @return \Illuminate\Auth\GenericUser|null
+     * @param $user
+     * @return User
      */
     protected function getGenericUser($user)
     {
         if (! is_null($user)) {
-            return new GenericUser((array) $user);
+            return new User((array) $user);
         }
     }
 

@@ -61,10 +61,7 @@ class CheckUserFriendsListJob implements ShouldQueue
         $user = User::find($this->user_id);
 
         // получаем из mongodb старый список друзей
-        $res = VkFriend::query()
-            ->where('user_id', '=', $this->friend_id ?: $this->user_id)
-            ->first();
-        $oldVkFriends = $res ? $res->toArray() : [];
+        $oldVkFriends = VkFriend::getFriends($this->friend_id ?: $this->user_id);
         //~
 
         $vkClient = new Vk();
@@ -73,7 +70,6 @@ class CheckUserFriendsListJob implements ShouldQueue
         // сохраняем друзей в mongodb
         VkFriend::where('user_id', $this->friend_id ?: $this->user_id)
             ->update(['friends' => $vkFriends['items'], 'updated_at' => date('Y-m-d H:i:s')], ['upsert' => true]);
-
         foreach ($vkFriends['items'] as $vkFriend) {
             VkUser::batchUpdate(['id' => $vkFriend['id']], $vkFriend, ['upsert' => true]);
         }

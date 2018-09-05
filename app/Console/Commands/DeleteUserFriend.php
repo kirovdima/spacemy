@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\FriendsList;
+use App\FriendListChange;
 use App\FriendsStatus;
 use App\UserFriend;
 use Illuminate\Console\Command;
@@ -47,7 +47,7 @@ class DeleteUserFriend extends Command
             ->get()
             ->isNotEmpty();
         if (!$is_exists_for_other_users) {
-            FriendsList::where('user_id', $this->user_friend->friend_id)
+            FriendListChange::where('user_id', $this->user_friend->friend_id)
                 ->delete();
             FriendsStatus::where('user_id', $this->user_friend->friend_id)
                 ->delete();

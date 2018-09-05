@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Profile;
 use App\Console\Commands\DeleteUserFriend;
 use App\Exceptions\Exception;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AddPersonRequest;
+use App\Http\Requests\DeletePersonRequest;
+use App\Http\Requests\GetPersonRequest;
 use App\MongoModels\VkUser;
 use App\Services\FriendListService;
 use App\Services\Statistic\FriendsStatisticService;
 use App\Services\Statistic\VisitStatisticService;
 use App\UserFriend;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 
@@ -59,12 +63,13 @@ class FriendsController extends Controller
     }
 
     /**
-     * @param int $person_id
-     *
+     * @param GetPersonRequest $request
      * @return array
      */
-    public function get(int $person_id)
+    public function get(GetPersonRequest $request)
     {
+        $person_id = $request->route('id');
+
         $user = VkUser::getUser($person_id);
         $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
 
@@ -84,16 +89,16 @@ class FriendsController extends Controller
     }
 
     /**
-     * @param int $person_id
-     *
-     * @return UserFriend
-     * @throws \Exception
+     * @param AddPersonRequest $request
+     * @return $this|UserFriend
+     * @throws Exception
      */
-    public function add(int $person_id)
+    public function add(AddPersonRequest $request)
     {
-        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
-        if ($user_friend) {
-            throw new Exception(sprintf("friend '%s' already added", $person_id));
+        $person_id = $request->route('id');
+        if (Auth::user()->watchingPersonsCount() >= 5) {
+            return response(['error_message' => 'persons max count'])
+                ->setStatusCode(Response::HTTP_PAYMENT_REQUIRED);
         }
 
         $user_friend = new UserFriend();
@@ -105,18 +110,15 @@ class FriendsController extends Controller
     }
 
     /**
-     * @param int $person_id
-     *
+     * @param DeletePersonRequest $request
      * @return array
      * @throws Exception
      */
-    public function delete(int $person_id)
+    public function delete(DeletePersonRequest $request)
     {
-        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
-        if (!$user_friend) {
-            throw new Exception(sprintf("user '%s' is not a friend", $person_id));
-        }
+        $person_id = $request->route('id');
 
+        $user_friend = UserFriend::getByUserIdAndPersonId(Auth::user()->user_id, $person_id);
         Bus::dispatch(
             new DeleteUserFriend($user_friend)
         );

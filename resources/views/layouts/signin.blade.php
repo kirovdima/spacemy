@@ -48,7 +48,13 @@
                 <h3>SPACEMY.RU</h3>
             </div>
             <div class="text-center">
-                Следите за друзьями
+                Следите за друзьями ВКонтакте
+            </div>
+            <div class="d-flex justify-content-center">
+                <div class="text-left d-inline mt-4">
+                    <span>- Графики активности по часам/дням</span><br>
+                    <span>- Просмотр добавленных/удаленных друзей</span>
+                </div>
             </div>
             <div class="text-center my-5">
                 <a href="/login" class="btn btn-success">Войти</a>
