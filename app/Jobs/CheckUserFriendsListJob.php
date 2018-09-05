@@ -80,7 +80,7 @@ class CheckUserFriendsListJob implements ShouldQueue
         VkUser::execute();
         //~
 
-        if ($this->friend_id && $oldVkFriends['friends']) {
+        if ($this->friend_id && !empty($oldVkFriends['friends'])) {
             $friendIds   = array_map(function ($friend) { return $friend['id']; }, $oldVkFriends['friends']);
             $vkFriendIds = array_map(function ($friend) { return $friend['id']; }, $vkFriends['items']);
 

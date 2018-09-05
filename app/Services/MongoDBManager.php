@@ -15,7 +15,16 @@ class MongoDBManager
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new Manager(sprintf('mongodb://%s:%s/%s', config('database.connections.mongodb.host'), config('database.connections.mongodb.port'), config('database.connections.mongodb.database')));
+            self::$instance = new Manager(
+                sprintf(
+                    'mongodb://%s:%s@%s:%s/%s',
+                    config('database.connections.mongodb.username'),
+                    config('database.connections.mongodb.password'),
+                    config('database.connections.mongodb.host'),
+                    config('database.connections.mongodb.port'),
+                    config('database.connections.mongodb.database')
+                )
+            );
         }
 
         return self::$instance;
