@@ -5,30 +5,22 @@
                 <div class="float-left"><img :src="user.photo_50"></div>
                 <div class="float-left ml-2">{{ user.first_name }} <br> {{ user.last_name }}</div>
             </div>
-            <div class="col-3 clearfix">
-                <div v-if="!error_message" class="float-right">
-                    <a v-if="is_statistic_exists" v-on:click="deleteFriend(user.id)" class="btn btn-outline-danger" role="button">Не следить</a>
-                    <a v-else v-on:click="addFriend(user.id)" class="btn btn-outline-primary" role="button">Следить</a>
-                </div>
-            </div>
         </div>
+        <div class="mt-4"></div>
         <div v-if="error_message" class="alert alert-danger my-3" role="alert">
             <small>{{ error_message }}</small>
         </div>
-        <div class="mt-5">
-            <span v-if="start_monitoring_rus" class="text-info"><small>Начало сбора статистики: <em>{{ start_monitoring_rus }}</em></small></span>
-        </div>
         <div v-if="is_statistic_exists">
-            <ul class="nav nav-tabs mt-3 mb-5">
+            <ul class="nav nav-tabs mt-3 mb-3">
                 <li class="nav-item">
                     <router-link class="nav-link"
-                                 :to="{ name: 'person_visits_statistic' }"
-                                 v-bind:class="{'active': this.$route.name == 'person_visits_statistic'}">Активность</router-link>
+                                 :to="{ name: 'demo_visits_statistic' }"
+                                 v-bind:class="{'active': this.$route.name == 'demo_visits_statistic'}">Активность</router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link"
-                                 :to="{ name: 'person_friends_statistic' }"
-                                 v-bind:class="{'active': this.$route.name == 'person_friends_statistic'}">
+                                 :to="{ name: 'demo_friends_statistic' }"
+                                 v-bind:class="{'active': this.$route.name == 'demo_friends_statistic'}">
                         Новые друзья
                         <template v-if="unshowFriendsStatistic[user.id]">
                             <sup v-if="unshowFriendsStatistic[user.id]['add']" class="badge badge-pill badge-success">+{{ unshowFriendsStatistic[user.id]['add'] }}</sup>

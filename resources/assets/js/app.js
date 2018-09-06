@@ -13,6 +13,8 @@ if (api_token) {
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + api_token.content;
 }
 
+let random_person_id_element = document.head.querySelector('meta[name="random-person-id"]');
+
 window.Vue = require('vue');
 
 import VueRouter from 'vue-router';
@@ -26,7 +28,47 @@ import Statistic        from './components/StatisticComponent.vue';
 import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vue';
 import StatisticFriends from './components/statistic/StatisticFriendsComponent.vue';
 
+import DemoStatistic from './components/DemoStatisticComponent.vue';
+
 const routes = [
+    {
+        path: '/signin',
+        components: {
+            demoStatistic: DemoStatistic,
+            footer:    Footer,
+        },
+        props: {
+            demoStatistic: (route) => ({
+                person_id: parseInt(random_person_id_element.content),
+            }),
+        },
+        children: [
+            {
+                path: '/signin',
+                name: 'demo_visits_statistic',
+                components: {
+                    statisticVisits: StatisticVisits
+                },
+                props: {
+                    statisticVisits: (route) => ({
+                        person_id: parseInt(random_person_id_element.content),
+                    })
+                },
+            },
+            {
+                path: '/signin/demo/friends',
+                name: 'demo_friends_statistic',
+                components: {
+                    statisticFriends: StatisticFriends
+                },
+                props: {
+                    statisticFriends: (route) => ({
+                        person_id: parseInt(random_person_id_element.content),
+                    })
+                },
+            }
+        ]
+    },
     {
         path: '/',
         components: {
@@ -43,20 +85,35 @@ const routes = [
             statistic: Statistic,
             footer: Footer,
         },
+        props: {
+            statistic: (route) => ({
+                person_id: route.params.person_id,
+            }),
+        },
         children: [
             {
                 path: 'visits',
                 name: 'person_visits_statistic',
                 components: {
                     statisticVisits: StatisticVisits
-                }
+                },
+                props: {
+                    statisticVisits: (route) => ({
+                        person_id: route.params.person_id,
+                    })
+                },
             },
             {
                 path: 'friends',
                 name: 'person_friends_statistic',
                 components: {
                     statisticFriends: StatisticFriends
-                }
+                },
+                props: {
+                    statisticFriends: (route) => ({
+                        person_id: route.params.person_id,
+                    })
+                },
             }
         ]
     },

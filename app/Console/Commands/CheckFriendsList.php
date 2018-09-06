@@ -42,6 +42,10 @@ class CheckFriendsList extends Command
     {
         $users = User::get();
         foreach ($users as $user) {
+            if ($user->isGuest()) {
+                continue;
+            }
+
             CheckUserFriendsListJob::dispatch($user->user_id);
         }
 

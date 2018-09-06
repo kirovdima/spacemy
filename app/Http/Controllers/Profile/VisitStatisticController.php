@@ -39,7 +39,9 @@ class VisitStatisticController extends Controller
 
         $labels = $visit_statistic_service->getLabels();
         $data   = $visit_statistic_service->getData();
-        $start_monitoring_date = $visit_statistic_service->getUserFriend()->created_at;
+        $start_monitoring_date = $visit_statistic_service->getUserFriend()
+            ? $visit_statistic_service->getUserFriend()->created_at
+            : null;
 
         return ['labels' => $labels, 'data' => $data, 'start_monitoring_date' => $start_monitoring_date];
     }

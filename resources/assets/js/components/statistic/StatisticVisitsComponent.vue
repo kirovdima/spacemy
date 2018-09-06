@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div class="mb-4 ml-4">
+        <div class="mb-3 ml-4">
             <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'day'}" v-on:click="setPeriod('day')" style="cursor: pointer">День</button>
             <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'week'}" v-on:click="setPeriod('week')" style="cursor: pointer">Неделя</button>
             <button type="button" class="btn btn-sm btn-outline-success m-1" v-bind:class="{'active': period === 'month'}" v-on:click="setPeriod('month')" style="cursor: pointer">Месяц</button>
         </div>
-        <div class="mb-5 ml-4">
+        <div class="mb-4 ml-4">
             <button type="button" class="btn btn-sm btn-outline-success m-1 px-2 py-1" v-bind:class="{ 'disabled' : !isLeftArrowShow }" v-on:click="setPrevStartDate()" style="cursor: pointer">
                 <span class="font-weight-bold"><</span>
             </button>
@@ -44,6 +44,10 @@
                 start_monitoring_date: new Date(),
             }
         },
+
+        props: [
+            'person_id',
+        ],
 
         computed: {
             formattedStartDate: function () {
@@ -147,7 +151,7 @@
             getStatistic() {
                 var app = this;
                 app.wait = true;
-                axios.get('/api/statistic/' + app.$route.params.person_id + '/' + app.period + '/' + this.formattedStartDate).then(function (response) {
+                axios.get('/api/statistic/' + app.person_id + '/' + app.period + '/' + this.formattedStartDate).then(function (response) {
 
                     app.start_monitoring_date = new Date(response.data.start_monitoring_date);
 

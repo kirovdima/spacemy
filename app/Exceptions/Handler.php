@@ -50,6 +50,8 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+//        return parent::render($request, $exception);
+
         Log::error(
             sprintf(
                 "Exception message: %s; code: %s; file: %s:%s;\n\nTrace: %s",

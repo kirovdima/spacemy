@@ -8,6 +8,7 @@ use App\MongoModels\VkUser;
 use App\UserFriend;
 use App\UserVisitLog;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Jenssegers\Date\Date;
@@ -36,7 +37,7 @@ class FriendsStatisticService
         }
 
         $user_friend = UserFriend::getByUserIdAndPersonId($this->owner_id, $person_id);
-        if (!$user_friend) {
+        if (!$user_friend && !Auth::user()->isGuest()) {
             throw new Exception(sprintf("user '%s' is not a friend", $person_id));
         }
 

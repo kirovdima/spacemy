@@ -21,7 +21,10 @@ class VisitsStatisticRequest extends FormRequest
 
         return in_array($period, PeriodFactory::$allowed_period)
             && false !== strtotime($start_date)
-            && Auth::user()->isStatisticAvailable($person_id)
+            && (
+                Auth::user()->isStatisticAvailable($person_id)
+                || Auth::user()->isGuest()
+            )
             ;
     }
 

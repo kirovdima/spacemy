@@ -33,9 +33,13 @@
             }
         },
 
+        props: [
+            'person_id',
+        ],
+
         mounted () {
             var app = this;
-            axios.get('/api/statistic/' + app.$route.params.person_id + '/friend').then(function (response) {
+            axios.get('/api/statistic/' + app.person_id + '/friend').then(function (response) {
                 app.friends_list_change = response.data.friends_list_change;
                 app.wait = false;
             })

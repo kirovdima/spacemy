@@ -16,7 +16,7 @@ class FriendsStatisticRequest extends FormRequest
     {
         $person_id = $this->route('person_id');
 
-        return Auth::user()->isStatisticAvailable($person_id);
+        return Auth::user()->isStatisticAvailable($person_id) || Auth::user()->isGuest();
     }
 
     /**

@@ -2,13 +2,18 @@
 <html lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="description" content="Следить за друзьями вконтакте">
-    <meta name="keywords" content="Следить за друзьями вконтакте, активность друзей вконтакте, добавленные, удаленные друзья">
+    <meta name="description" content="Шпион вконтакте, следить за друзьями, статистика пользователя вконтакте">
+    <meta name="keywords" content="Шпион вконтакте, следить за друзьями, активность пользователя, изменения в списке друзей, статистика пользователя вконтакте">
     <meta http-equiv="Content-Language" content="ru">
     <meta name="robots" content="ALL,index,follow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="api-token" content="{{ $api_token }}">
+    <meta name="random-person-id" content="{{ $random_person_id }}">
     <meta name="yandex-verification" content="144ebb06bc676d16" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="google-site-verification" content="XlTG1olQN5UJA-UAi57i4eEw6H4bMYiyQQ8uo1vl2oI" />
 
     <link rel="stylesheet" href="/css-new/bootstrap.min.css"/>
     <link rel="stylesheet" href="/css-new/bootstrap-grid.min.css"/>
@@ -44,30 +49,72 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/49091602" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 
-    <title>Следить за друзьями</title>
+    <title>Шпион ВКонтакте</title>
+    <style>
+        .border-3 {
+            border-width: 3px !important;
+        }
+    </style>
 </head>
 <body>
-    <div class="container d-flex justify-content-center" style="height: 100vh; width: 100vw;">
-        <div class="align-self-center">
-            <div class="text-center">
-                <h3>SPACEMY.RU</h3>
-            </div>
-            <div class="text-center">
-                Следите за друзьями ВКонтакте
-            </div>
-            <div class="d-flex justify-content-center">
-                <div class="text-left d-inline mt-4">
-                    <span>- Графики активности по часам/дням</span><br>
-                    <span>- Просмотр добавленных/удаленных друзей</span>
+    <div id="app">
+        <div class="container">
+            <div class="row fixed-top bg-info text-white p-3">
+                <div class="col text-center">
+                    <a href="/login" class="btn btn-outline-light">Следить за друзьями</a>
                 </div>
             </div>
-            <div class="text-center my-5">
-                <a href="/login" class="btn btn-success">Войти</a>
+            <div class="row my-5">
+                <div class="col"></div>
             </div>
-            <div class="text-center mt-5 my-2 pt-lg-5">
-                <small>Для слежения за пользователями мы используем публичное API ВКонтакте, что гарантирует Вам <strong>полную конфиденциальность</strong></small>
+            <div class="row mt-5">
+                <div class="col text-center">
+                    <h1 class="display-4">Шпион ВКонтакте</h1>
+                </div>
             </div>
+            <div class="row text-center">
+                <div class="col">
+                    Следите за своими друзьями
+                </div>
+            </div>
+            <div class="row mt-5 ml-1 border-left border-success border-3">
+                <div class="col">
+                    <h5 class="mb-4">Информация об активности пользователя</h5>
+                    <p>Подробная стастистика о том, сколько часов/минут пользователь сидел ВКонтакте в виде удобных графиков
+                        по дням/неделям/месяцам</p>
+                </div>
+            </div>
+            <div class="row mt-5 ml-1 border-left border-success border-3">
+                <div class="col">
+                    <h5 class="mb-4">Изменения в списке друзей</h5>
+                    <p>Отображение всех изменений в списке друзей интересующего Вас пользователя с указанием даты, когда произошло событие</p>
+                </div>
+            </div>
+            <div class="row text-center mt-5">
+                <div class="col text-center lead">
+                    <h4>Пример статистики пользователя</h4>
+                </div>
+            </div>
+            <div class="py-3 ml-1" style="min-height: 70vh">
+                <router-view name="demoStatistic"></router-view>
+            </div>
+            <div class="row mt-5 ml-1 border-left border-info border-3">
+                <div class="col">
+                    <h5 class="mb-4">Как шпионить с помощью данного сайта?</h5>
+                    <p>После того как Вы авторизуетесь в приложении, перед Вами откроется список Ваших друзей ВКонтакте. Нажмите на интересующего Вас
+                    друга и нажмите кнопку "Следить". Как только Вы сделаете это, наш сайт начнет в автоматическом режиме с определенными интервалами
+                    времени опрашивать ВКонтакте на наличие этого пользователя в сети и изменения в списке его друзей. <b>Вернитесь</b> на сайт <b>через несколько
+                    часов</b> и Вы увидете статистику по Вашему другу!</p>
+                </div>
+            </div>
+            <div class="row my-5">
+                <div class="col text-center">
+                    <a href="/login" class="btn btn-outline-info">Следить за друзьями</a>
+                </div>
+            </div>
+            <router-view name="footer"></router-view>
         </div>
     </div>
 </body>
+<script src="{{ asset('js/app.js') }}"></script>
 </html>

@@ -82,7 +82,7 @@ class FriendsController extends Controller
 
         return [
             'user'                    => $user,
-            'is_statistic_exists'     => $user_friend ? true : false,
+            'is_statistic_exists'     => (bool) $user_friend || Auth::user()->isGuest(),
             'unshow_friend_statistic' => $unshow_friend_statistic,
             'start_monitoring_rus'    => $user_friend ? $user_friend->getFormattedCreatedAt() : null,
         ];

@@ -16,7 +16,7 @@ class GetPersonRequest extends FormRequest
     {
         $person_id = $this->route('id');
 
-        return Auth::user()->isFriend($person_id);
+        return Auth::user()->isFriend($person_id) || Auth::user()->isGuest();
     }
 
     /**

@@ -25,6 +25,8 @@ class User extends Model implements Authenticatable
 {
     use \Illuminate\Auth\Authenticatable;
 
+    const GUEST_API_TOKEN = 'dkZC434DFVZA667xCVbnh7fQwEzXDFBGH67Vghhg';
+
     protected $table = 'users';
 
     protected $primaryKey = 'user_id';
@@ -32,6 +34,14 @@ class User extends Model implements Authenticatable
     public $incrementing = false;
 
     protected $fillable = ['user_id', 'access_token', 'api_token'];
+
+    /**
+     * @return bool
+     */
+    public function isGuest()
+    {
+        return $this->api_token == self::GUEST_API_TOKEN;
+    }
 
     /**
      * @param int $person_id

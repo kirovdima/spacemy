@@ -118,10 +118,6 @@ class VisitStatisticService
      */
     public function getUserFriend()
     {
-        if (null === $this->user_friend) {
-            throw new Exception(sprintf("user_friend is null"));
-        }
-
         return $this->user_friend;
     }
 

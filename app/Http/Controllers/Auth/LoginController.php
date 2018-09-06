@@ -24,7 +24,12 @@ class LoginController extends Controller
 
     public function signin()
     {
-        return view('layouts.signin');
+        return view(
+            'layouts.signin', [
+                'api_token'        => User::GUEST_API_TOKEN,
+                'random_person_id' => 12922845,
+            ]
+        );
     }
 
     public function login()
