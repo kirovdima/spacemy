@@ -69,6 +69,7 @@ class LoginController extends Controller
 
         $user_id      = $json['user_id'];
         $access_token = $json['access_token'];
+        $email        = $json['email'] ?? null;
 
         $user = User::find($user_id);
         if (!$user) {
@@ -76,6 +77,7 @@ class LoginController extends Controller
             $user->user_id      = $user_id;
             $user->api_token    = Str::random(60);
         }
+        $user->email        = $email;
         $user->access_token = $access_token;
         $user->save();
 

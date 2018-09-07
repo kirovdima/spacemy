@@ -116,7 +116,7 @@ return [
         'oauth_url' => 'https://oauth.vk.com/authorize',
         'access_token_url' => 'https://oauth.vk.com/access_token',
         'display' => 'page',
-        'scope' => 'offline,friends',
+        'scope' => 'offline,friends,email',
         'v' => '5.73',
 
         'api_url' => 'https://api.vk.com/method',

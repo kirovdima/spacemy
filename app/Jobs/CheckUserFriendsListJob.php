@@ -66,6 +66,10 @@ class CheckUserFriendsListJob implements ShouldQueue
 
         $vkClient = new Vk();
         $vkFriends = $vkClient->getFriends($user, $this->friend_id ?: null);
+        if (!$vkFriends) {
+            usleep(self::SLEEP_INTERVAL);
+            return;
+        }
 
         // сохраняем друзей в mongodb
         VkFriend::where('user_id', $this->friend_id ?: $this->user_id)

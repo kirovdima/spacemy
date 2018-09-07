@@ -2,12 +2,17 @@
 
 namespace App\Services;
 
+use App\Exceptions\Exception;
 use App\ResponseLog;
+use App\UserFriend;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Log;
 
 class Vk
 {
+    const ERROR_CODE_USER_WAS_DELETED_OR_BANNED = 18;
+
     private $http_client = null;
 
     public function __construct()
@@ -53,7 +58,7 @@ class Vk
         $responseLog->save();
 
         if (isset($resArr['error'])) {
-            return false;
+            return $resArr['error'];
         }
 
         return $resArr['response'];
@@ -61,8 +66,10 @@ class Vk
 
     /**
      * @param $user
+     * @param null $owner_id
      *
      * @return array|bool
+     * @throws Exception
      */
     public function getFriends($user, $owner_id = null)
     {
@@ -74,8 +81,20 @@ class Vk
                 'fields'  => 'id,first_name,last_name,photo_50'
             ]
         );
-        if (!$friends) {
-            $friends = [];
+
+        if (isset($friends['error_code'])) {
+            switch ($friends['error_code']) {
+                case self::ERROR_CODE_USER_WAS_DELETED_OR_BANNED:
+                    if ($owner_id) {
+                        $user_friend = UserFriend::getByUserIdAndPersonId($user->user_id, $owner_id);
+                        $user_friend->disable($friends['error_msg']);
+                    }
+                    break;
+                default:
+                    Log::error(sprintf("undefined error_code: %s, error_message: %s", $friends['error_code'], $friends['error_msg']));
+                    break;
+            }
+            return false;
         }
 
         return $friends;
@@ -97,6 +116,11 @@ class Vk
                 'fields'   => 'id,first_name,last_name,photo_50,online,last_seen',
             ]
         );
+
+        if (isset($users['error_code'])) {
+            Log::error(sprintf("undefined error_code: %s, error_message: %s", $users['error_code'], $users['error_msg']));
+            return false;
+        }
 
         return $users;
     }

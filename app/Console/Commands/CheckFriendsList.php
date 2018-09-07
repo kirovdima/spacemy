@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\CheckUserFriendsListJob;
 use App\User;
+use App\UserFriend;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +54,7 @@ class CheckFriendsList extends Command
             SELECT u.user_id, uf.friend_id
             FROM users u 
               JOIN user_friends uf ON u.user_id = uf.user_id
+            WHERE uf.status = ' . UserFriend::STATUS_ACTIVE . '
         ');
 
         foreach ($user_friends as $user_friend) {

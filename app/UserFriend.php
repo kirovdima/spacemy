@@ -18,6 +18,9 @@ use Jenssegers\Date\Date;
  */
 class UserFriend extends Model
 {
+    const STATUS_ACTIVE = 1;
+    const STATUS_DISABLE = 2;
+
     protected $table = 'user_friends';
 
     public $incrementing = false;
@@ -72,5 +75,18 @@ class UserFriend extends Model
         ;
 
         return $formatted_created_at;
+    }
+
+    /**
+     * @param string $reason
+     */
+    public function disable(string $reason)
+    {
+        self::where('user_id', $this->user_id)
+            ->where('friend_id', $this->friend_id)
+            ->update([
+                'status' => self::STATUS_DISABLE,
+                'reason' => $reason
+            ]);
     }
 }
