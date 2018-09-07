@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -44,28 +46,35 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @param Exception $exception
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Exception $exception)
     {
-//        return parent::render($request, $exception);
+        if (!($exception instanceof NotFoundHttpException)) {
+            Log::error(
+                sprintf(
+                    "Url: %s;\nException: %s\nException message: %s; code: %s;\nFile: %s:%s;\n\nTrace: %s",
+                    url()->current(),
+                    get_class($exception),
+                    $exception->getMessage(),
+                    $exception->getCode(),
+                    $exception->getFile(),
+                    $exception->getLine(),
+                    $exception->getTraceAsString()
+                )
+            );
+        }
 
-        Log::error(
-            sprintf(
-                "Exception message: %s; code: %s; file: %s:%s;\n\nTrace: %s",
-                $exception->getMessage(),
-                $exception->getCode(),
-                $exception->getFile(),
-                $exception->getLine(),
-                $exception->getTraceAsString()
-            )
-        );
-        return response()->json(
-            ['error_message' => $exception->getMessage()],
-            $exception->getCode() ?: 500
-        );
+        if (Request::is('api*')) {
+            return response()->json(
+                ['error_message' => $exception->getMessage()],
+                $exception->getCode() ?: 500
+            );
+        } else {
+            return parent::render($request, $exception);
+        }
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
