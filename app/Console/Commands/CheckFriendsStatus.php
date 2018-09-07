@@ -41,7 +41,7 @@ class CheckFriendsStatus extends Command
     {
         $users = User::all();
         foreach ($users as $user) {
-            if ($user->isGuest()) {
+            if ($user->isGuest() || !$user->isActive()) {
                 continue;
             }
             CheckUserFriendsStatusJob::dispatch($user);

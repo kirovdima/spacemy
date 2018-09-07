@@ -43,7 +43,7 @@ class CheckFriendsList extends Command
     {
         $users = User::get();
         foreach ($users as $user) {
-            if ($user->isGuest()) {
+            if ($user->isGuest() || !$user->isActive()) {
                 continue;
             }
 
@@ -54,7 +54,8 @@ class CheckFriendsList extends Command
             SELECT u.user_id, uf.friend_id
             FROM users u 
               JOIN user_friends uf ON u.user_id = uf.user_id
-            WHERE uf.status = ' . UserFriend::STATUS_ACTIVE . '
+            WHERE u.access_token_expired IS NULL 
+              AND uf.status = ' . UserFriend::STATUS_ACTIVE . '
         ');
 
         foreach ($user_friends as $user_friend) {

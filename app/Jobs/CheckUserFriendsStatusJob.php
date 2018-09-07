@@ -33,7 +33,7 @@ class CheckUserFriendsStatusJob implements ShouldQueue
      */
     public function __construct($user)
     {
-        $this->queue = self::QUEUE_NAME;
+        $this->queue = config('queue.prefix') . self::QUEUE_NAME;
 
         $this->user = $user;
     }
@@ -59,7 +59,7 @@ class CheckUserFriendsStatusJob implements ShouldQueue
 
         $vkFriends = $vkClient->getUsers($this->user, $friend_ids);
         if (!$vkFriends) {
-            return;
+            return ;
         }
 
         foreach ($vkFriends as $vkFriend) {

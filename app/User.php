@@ -44,6 +44,14 @@ class User extends Model implements Authenticatable
     }
 
     /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->access_token_expired == null;
+    }
+
+    /**
      * @param int $person_id
      * @return bool
      */
@@ -78,5 +86,14 @@ class User extends Model implements Authenticatable
     public function watchingPersonsCount()
     {
         return UserFriend::getPersonsCount($this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function deactivateAccessToken()
+    {
+        $this->access_token_expired = date('Y-m-d H:i:s');
+        return $this->save();
     }
 }
