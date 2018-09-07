@@ -69,7 +69,7 @@
             </div>
             <div class="row mt-5">
                 <div class="col text-center">
-                    <h1 class="display-4">Шпион ВКонтакте</h1>
+                    <h2>Шпион ВКонтакте</h2>
                 </div>
             </div>
             <div class="row text-center">

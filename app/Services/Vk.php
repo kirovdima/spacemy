@@ -43,7 +43,8 @@ class Vk
 
         $responseLog = new ResponseLog();
         $responseLog->method     = $method_name;
-        $responseLog->parameters = print_r($params, true);
+        $responseLog->parameters = json_encode($params);
+        $responseLog->response   = $res->getBody();
         $responseLog->status     = isset($resArr['error']) ? ResponseLog::STATUS_ERROR : ResponseLog::STATUS_OK;
         if (isset($resArr['error'])) {
             $responseLog->error_code = $resArr['error']['error_code'];

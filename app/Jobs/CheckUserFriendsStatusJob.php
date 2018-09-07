@@ -50,6 +50,11 @@ class CheckUserFriendsStatusJob implements ShouldQueue
         $friends = UserFriend::where('user_id', $this->user->user_id)
             ->get()
             ->toArray();
+
+        if (!$friends) {
+            return ;
+        }
+
         $friend_ids = array_map(function ($friend) { return $friend['friend_id']; }, $friends);
 
         $vkFriends = $vkClient->getUsers($this->user, $friend_ids);
@@ -58,6 +63,11 @@ class CheckUserFriendsStatusJob implements ShouldQueue
         }
 
         foreach ($vkFriends as $vkFriend) {
+            if (isset($vkFriend['deactivated'])) {
+                //@todo сохранять в user_friends и больше не опрашивать его статус
+                continue;
+            }
+
             $status = $vkFriend['online'] == FriendsStatus::STATUS_ONLINE
                 ? $vkFriend['online']
                 : (time() - $vkFriend['last_seen']['time'] < self::TIME_INTERVAL
