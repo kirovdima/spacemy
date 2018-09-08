@@ -12,7 +12,7 @@
     <meta name="random-person-id" content="{{ $random_person_id }}">
     <meta name="yandex-verification" content="144ebb06bc676d16" />
 
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
     <meta name="google-site-verification" content="XlTG1olQN5UJA-UAi57i4eEw6H4bMYiyQQ8uo1vl2oI" />
 
     <link rel="stylesheet" href="/css-new/bootstrap.min.css"/>
