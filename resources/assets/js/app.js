@@ -20,9 +20,10 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router';
 window.Vue.use(VueRouter);
 
-import Menu    from './components/MenuComponent.vue';
-import Friends from './components/FriendsComponent.vue';
-import Footer  from './components/FooterComponent.vue';
+import Menu      from './components/MenuComponent.vue';
+import Friends   from './components/FriendsComponent.vue';
+import Footer    from './components/FooterComponent.vue';
+import AboutMenu from './components/AboutMenuComponent';
 
 import Statistic        from './components/StatisticComponent.vue';
 import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vue';
@@ -32,10 +33,18 @@ import DemoStatistic from './components/DemoStatisticComponent.vue';
 
 const routes = [
     {
-        path: '/signin',
+        path: '/',
         components: {
-            demoStatistic: DemoStatistic,
+            aboutMenu: AboutMenu,
             footer:    Footer,
+        },
+    },
+    {
+        path: '/demo/visits',
+        components: {
+            aboutMenu:     AboutMenu,
+            demoStatistic: DemoStatistic,
+            footer:        Footer,
         },
         props: {
             demoStatistic: (route) => ({
@@ -44,7 +53,7 @@ const routes = [
         },
         children: [
             {
-                path: '/signin',
+                path: '/demo/visits',
                 name: 'demo_visits_statistic',
                 components: {
                     statisticVisits: StatisticVisits
@@ -56,7 +65,7 @@ const routes = [
                 },
             },
             {
-                path: '/signin/demo/friends',
+                path: '/demo/friends',
                 name: 'demo_friends_statistic',
                 components: {
                     statisticFriends: StatisticFriends
@@ -70,7 +79,14 @@ const routes = [
         ]
     },
     {
-        path: '/',
+        path: '/about',
+        components: {
+            aboutMenu: AboutMenu,
+            footer:    Footer,
+        },
+    },
+    {
+        path: '/friends',
         components: {
             menu:    Menu,
             friends: Friends,

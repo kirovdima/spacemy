@@ -15,15 +15,10 @@ class LoginController extends Controller
 {
     public function index()
     {
-        if (!\Auth::check()) {
-            return redirect('signin');
+        if (Auth::check()) {
+            return redirect('/friends');
         }
 
-        return view('layouts.profile', ['api_token' => Auth::user() ? Auth::user()->api_token : '']);
-    }
-
-    public function signin()
-    {
         return view(
             'layouts.signin', [
                 'api_token'        => User::GUEST_API_TOKEN,
@@ -88,6 +83,15 @@ class LoginController extends Controller
             Bus::dispatchNow($get_friends_job);
         }
 
-        return redirect('/');
+        return redirect('/friends');
+    }
+
+    public function friends()
+    {
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
+        return view('layouts.profile', ['api_token' => Auth::user() ? Auth::user()->api_token : '']);
     }
 }

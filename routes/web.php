@@ -12,9 +12,11 @@
 */
 
 Route::get('/', 'Auth\LoginController@index');
+Route::get('/demo/visits', 'Auth\LoginController@index');
+Route::get('/demo/friends', 'Auth\LoginController@index');
+Route::get('/about', 'Auth\LoginController@index');
 
-Route::get('/signin', 'Auth\LoginController@signin');
-Route::get('/signin/demo/friends', 'Auth\LoginController@signin');
+Route::get('/friends', 'Auth\LoginController@friends');
 
 Route::get('/login', 'Auth\LoginController@login');
 Route::get('/verify', 'Auth\LoginController@verify');
