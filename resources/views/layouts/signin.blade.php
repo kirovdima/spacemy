@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="description" content="Шпион вконтакте, следить за друзьями, статистика пользователя вконтакте">
-    <meta name="keywords" content="Шпион вконтакте, следить за друзьями, активность пользователя, изменения в списке друзей, статистика пользователя вконтакте">
+    <meta name="description" content="@yield('description')">
+    <meta name="keywords" content="@yield('keywords')">
     <meta http-equiv="Content-Language" content="ru">
     <meta name="robots" content="ALL,index,follow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -86,7 +86,8 @@
                     <a href="/login" class="btn btn-outline-info">Следить за друзьями</a>
                 </div>
             </div>
-            <router-view name="footer"></router-view>
+
+            @include('signin.footer')
         </div>
     </div>
 </body>
