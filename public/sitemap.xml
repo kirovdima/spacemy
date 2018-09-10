@@ -9,21 +9,24 @@
 
 <url>
   <loc>http://spacemy.ru/</loc>
-  <lastmod>2018-09-08T20:14:18+00:00</lastmod>
+  <lastmod>2018-09-11T14:47:45+00:00</lastmod>
+  <priority>1.00</priority>
 </url>
 <url>
   <loc>http://spacemy.ru/demo/visits</loc>
-  <lastmod>2018-09-08T20:14:18+00:00</lastmod>
-</url>
-<url>
-  <loc>http://spacemy.ru/demo/friends</loc>
-  <lastmod>2018-09-08T20:14:18+00:00</lastmod>
+  <lastmod>2018-09-11T14:47:45+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
   <loc>http://spacemy.ru/about</loc>
-  <lastmod>2018-09-08T20:14:18+00:00</lastmod>
+  <lastmod>2018-09-11T14:47:45+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
-
+<url>
+  <loc>http://spacemy.ru/demo/friends</loc>
+  <lastmod>2018-09-11T14:47:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
 
 
 </urlset>
