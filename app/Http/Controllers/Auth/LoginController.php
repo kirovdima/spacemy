@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Jobs\CheckUserFriendsListJob;
 use App\MongoModels\VkFriend;
 use App\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 class LoginController extends Controller
 {
@@ -19,12 +20,24 @@ class LoginController extends Controller
             return redirect('/friends');
         }
 
-        return view(
-            'layouts.signin', [
-                'api_token'        => User::GUEST_API_TOKEN,
-                'random_person_id' => 12922845,
-            ]
-        );
+        switch (Route::currentRouteName()) {
+            case  'main';
+                $view = 'signin.main';
+                break;
+            case 'demo_visits';
+            case 'demo_friends';
+                $view = 'signin.example';
+                break;
+            case 'about';
+            default:
+                $view = 'signin.about';
+                break;
+        }
+
+        return View::make($view, [
+            'api_token'        => User::GUEST_API_TOKEN,
+            'random_person_id' => 12922845,
+        ]);
     }
 
     public function login()
