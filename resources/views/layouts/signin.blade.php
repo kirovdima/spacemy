@@ -12,6 +12,11 @@
     <meta name="random-person-id" content="{{ $random_person_id }}">
     <meta name="yandex-verification" content="144ebb06bc676d16" />
 
+    <meta property="og:title" content="Шпион ВКонтакте | Статистика активности | Новые и удаленные друзья" />
+    <meta property="og:site_name" content="Шпион ВКонтакте" />
+    <meta property="og:description" content="Сайт шпионит за вашими друзьями ВКонтакте и показывает: сколько времени пользователь находился в сети, его новых и удаленных друзей." />
+    <meta property="og:type" content="website" />
+
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
     <meta name="google-site-verification" content="XlTG1olQN5UJA-UAi57i4eEw6H4bMYiyQQ8uo1vl2oI" />
 
