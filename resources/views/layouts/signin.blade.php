@@ -10,7 +10,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="api-token" content="{{ $api_token }}">
     <meta name="random-person-id" content="{{ $random_person_id }}">
+    
     <meta name="yandex-verification" content="144ebb06bc676d16" />
+    <meta name='wmail-verification' content='aed0434ef56aa82d540aa3a5716803fb' />
+    <meta name="google-site-verification" content="XlTG1olQN5UJA-UAi57i4eEw6H4bMYiyQQ8uo1vl2oI" />
 
     <meta property="og:title" content="Шпион ВКонтакте | Статистика активности | Новые и удаленные друзья" />
     <meta property="og:site_name" content="Шпион ВКонтакте" />
@@ -20,7 +23,6 @@
     <meta property="og:url" content="http://spacemy.ru" />
 
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
-    <meta name="google-site-verification" content="XlTG1olQN5UJA-UAi57i4eEw6H4bMYiyQQ8uo1vl2oI" />
 
     <link rel="stylesheet" href="/css-new/bootstrap.min.css"/>
     <link rel="stylesheet" href="/css-new/bootstrap-grid.min.css"/>
