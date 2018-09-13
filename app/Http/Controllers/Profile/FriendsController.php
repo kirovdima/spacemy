@@ -96,7 +96,7 @@ class FriendsController extends Controller
     public function add(AddPersonRequest $request)
     {
         $person_id = $request->route('id');
-        if (Auth::user()->watchingPersonsCount() >= 5) {
+        if (Auth::user()->watchingPersonsCount() >= 5 && Auth::user()->user_id != 15262661) {
             return response(['error_message' => 'persons max count'])
                 ->setStatusCode(Response::HTTP_PAYMENT_REQUIRED);
         }

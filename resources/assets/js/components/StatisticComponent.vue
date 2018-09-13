@@ -15,6 +15,10 @@
         <div v-if="error_message" class="alert alert-danger my-3" role="alert">
             <small>{{ error_message }}</small>
         </div>
+        <div v-if="is_info_message" class="alert alert-info my-3" role="alert">
+            <small>Поздравляем, Вы начали слежение за пользователем! Пока здесь нет статистики, но она <b>начнет появляться</b> в ближайшее время. <b>Вернитесь</b> на сайт
+                через <b>несколько часов</b> и вы увидите сколько времени Ваш друг сидит Вконтакте, а также кого он добавляет или удаляет из друзей</small>
+        </div>
         <div class="mt-5">
             <span v-if="start_monitoring_rus" class="text-info"><small>Начало сбора статистики: <em>{{ start_monitoring_rus }}</em></small></span>
         </div>
@@ -72,6 +76,7 @@
                 start_monitoring_rus: null,
 
                 error_message: null,
+                is_info_message: false,
             }
         },
 
@@ -91,6 +96,7 @@
                 axios.post('/api/friend/' + id)
                     .then(function (response) {
                         app.is_statistic_exists = true;
+                        app.is_info_message = true;
                     })
                     .catch(error => {
                         this.error_message = this.getTextError(error.response.status, error.response.data.error_message);
