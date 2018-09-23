@@ -83,7 +83,7 @@ class LoginController extends Controller
         if (!$user) {
             $user = new User();
             $user->user_id      = $user_id;
-            $user->api_token    = Str::random(60);
+            $user->api_token    = str_random(60);
         }
         $user->email        = $email;
         $user->access_token = $access_token;
