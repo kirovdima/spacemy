@@ -66,7 +66,7 @@ class CheckUserFriendsListJob implements ShouldQueue
 
         $vkClient = new Vk();
         $vkFriends = $vkClient->getFriends($user, $this->friend_id ?: null);
-        if (!$vkFriends) {
+        if (!$vkFriends || !$vkFriends['items']) {
             usleep(self::SLEEP_INTERVAL);
             return;
         }
