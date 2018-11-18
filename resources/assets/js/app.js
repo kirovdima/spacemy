@@ -23,7 +23,6 @@ window.Vue.use(VueRouter);
 import Menu      from './components/MenuComponent.vue';
 import Friends   from './components/FriendsComponent.vue';
 import Footer    from './components/FooterComponent.vue';
-import AboutMenu from './components/AboutMenuComponent';
 
 import Statistic        from './components/StatisticComponent.vue';
 import StatisticVisits  from './components/statistic/StatisticVisitsComponent.vue';
@@ -33,16 +32,8 @@ import DemoStatistic from './components/DemoStatisticComponent.vue';
 
 const routes = [
     {
-        path: '/',
-        components: {
-            aboutMenu: AboutMenu,
-            footer:    Footer,
-        },
-    },
-    {
         path: '/demo/visits',
         components: {
-            aboutMenu:     AboutMenu,
             demoStatistic: DemoStatistic,
             footer:        Footer,
         },
@@ -77,13 +68,6 @@ const routes = [
                 },
             }
         ]
-    },
-    {
-        path: '/about',
-        components: {
-            aboutMenu: AboutMenu,
-            footer:    Footer,
-        },
     },
     {
         path: '/friends',
