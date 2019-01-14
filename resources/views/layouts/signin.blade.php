@@ -76,16 +76,7 @@
             <div class="row my-5">
                 <div class="col"></div>
             </div>
-            <div class="row mt-5">
-                <div class="col text-center">
-                    <h2>Шпион ВКонтакте</h2>
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col">
-                    Следите за своими друзьями
-                </div>
-            </div>
+
             @include('signin.menu')
 
             @yield('content')
