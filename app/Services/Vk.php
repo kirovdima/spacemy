@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 class Vk
 {
     const ERROR_CODE_USER_WAS_DELETED_OR_BANNED = 18;
+    const ERROR_CODE_YOU_ARE_IN_USERS_BLACKLIST = 15;
     const ERROR_CODE_USER_INVALID_SESSION       = 5;
 
     private $http_client = null;
@@ -90,11 +91,13 @@ class Vk
                     $user->deactivateAccessToken();
                     break;
                 case self::ERROR_CODE_USER_WAS_DELETED_OR_BANNED:
+                case self::ERROR_CODE_YOU_ARE_IN_USERS_BLACKLIST:
                     if ($owner_id) {
                         $user_friend = UserFriend::getByUserIdAndPersonId($user->user_id, $owner_id);
                         $user_friend->disable($friends['error_msg']);
                     }
                     break;
+
                 default:
                     Log::error(sprintf("undefined error_code: %s, error_message: %s", $friends['error_code'], $friends['error_msg']));
                     break;
